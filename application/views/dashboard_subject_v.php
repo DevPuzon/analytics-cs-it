@@ -3,7 +3,7 @@
 
 <script src="assets/plugins/chartjs.js/chartjs.js"></script> 
 <div class="row">
-	<div class="col-md-5">
+	<div class="col-md-4">
 
 		<div class="card">
 			<div class="card-header">
@@ -15,7 +15,7 @@
 	 		<div class="card-body">
 	    		<div class="row">
 					
-					<div class="col-md-2">
+					<div class="col-md-3">
 						<div class="form-group">
 							<label for="">Course</label>
 							<select class="form-control form-control-sm" id="txtCourseType">
@@ -26,7 +26,7 @@
 						</div>
 					</div>
 
-					<div class="col-md-2">
+					<div class="col-md-3">
 						<div class="form-group">
 							<label for="">Year Level</label>
 							<select class="form-control form-control-sm" id="selYear">
@@ -42,7 +42,7 @@
 						</div>
 					</div>
 
-					<div class="col-md-2">
+					<div class="col-md-3">
 						<div class="form-group">
 							<label for="">Semester</label>
 							<select class="form-control form-control-sm" id="selSem">
@@ -64,9 +64,21 @@
 	    </div>
 	</div>
 	
-	<div class="col-md-7"> 
-		<div id="accordion-dashboard-subjects">  
-		</div>  
+	<div class="col-md-8"> 
+		<div class="row"> 
+			<div class="col-md-12"> 
+				<div id="accordion-dashboard-subjects">  
+				</div>  
+			</div>  
+			<div class="col-md-6"> 
+				<div id="grade-mid-dashboard-subjects">  
+				</div>  
+			</div>
+			<div class="col-md-6"> 
+				<div id="grade-final-dashboard-subjects">  
+				</div>  
+			</div>
+		</div> 
  	</div>
 </div> 
   

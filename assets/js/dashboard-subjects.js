@@ -159,13 +159,66 @@ async function _subjectAnalytics(id){
 	res = res.split(/(\r\n|\n|\r)/gm);
 	let dataRes = JSON.parse(res.splice(2,res.length).join("")); 
 	let average_grade= dataRes.average_grade;
-	console.log(dataRes); 
-	$("#accordion-dashboard-students").html(""); 
-	generateBreakDownChart(makeid(),"Total Average Grade Of Students",[id[4].replace("*+^"," ")],average_grade.avgMid,average_grade.avgFinal);
+	let student_grades= dataRes.student_grades;
+	$("#accordion-dashboard-subjects").html(""); 
+	generateBreakDownChart(makeid(),"Total Average Grade Of Students",[id[4].replaceAll("*+^"," ")],
+	parseFloat(average_grade.avgMid).toFixed(2),
+	parseFloat(average_grade.avgFinal).toFixed(2));
+
+	generateLeaderboardTable(makeid(),"Mid Term - Student Grade List","mid",student_grades.midGrades);
+	generateLeaderboardTable(makeid(),"Final Term - Student Grade List","final",student_grades.finalGrades);
+}
+
+async function generateLeaderboardTable(ctxID,title,season,student_grades){
+	// await new Promise((resolve)=>{setTimeout(()=>{resolve()},1000)});
+	$(`#grade-${season}-dashboard-subjects`).html("");
+	let retStr=`<div class="card">
+	<div class="card-header" id="${ctxID}head">
+		<h5 class="mb-0">
+			<button class="btn btn-link" data-toggle="collapse" data-target="#${ctxID}collapse" aria-expanded="true" aria-controls="${ctxID}collapse">
+			${title}
+			</button>
+		</h5>
+	</div>
+
+	<div id="${ctxID}collapse" class="collapse show" aria-labelledby="${ctxID}head" data-parent="#accordion-dashboard-subjects">
+		<div class="card-body">  `;
+		
+	retStr+=`<table class='table table-hover table-striped ${season}-tbl-data'>
+	<thead>
+	<tr>
+		<th> Student No. </th>
+		<th> Name </th>
+		<th> Grade </th>
+	</tr>
+	</thead>
+	<tbody>
+	`;
+	student_grades.forEach((els)=>{
+		retStr += `<tr style=' cursor: pointer; '  >
+			<td> ${els.student_no} </td>
+			<td> ${els.full_name} </td>
+			<td> ${els.grade} </td>
+		</tr>`;
+	})
+	retStr+=`</tbody>
+			</table></div>
+			</div>
+		</div> `;
+console.log(retStr,`#grade-${season}-dashboard-subjects`);
+	$(`#grade-${season}-dashboard-subjects`).html(retStr);
+	$(`.${season}-tbl-data`).DataTable({
+		'paging': true,
+		'lengthChange': true,
+		'searching': true, 
+		'info' : true,
+		'autoWidth': false,
+	});
 }
 
 function generateBreakDownChart(ctxID,title,labels,mid,finals){ 
-	$("#accordion-dashboard-students").append(` 
+	console.log(`generateBreakDownChart`,ctxID,title,labels,mid,finals); 
+	$("#accordion-dashboard-subjects").append(` 
 		<div class="card">
 			<div class="card-header" id="${ctxID}head">
 				<h5 class="mb-0">
@@ -175,14 +228,13 @@ function generateBreakDownChart(ctxID,title,labels,mid,finals){
 				</h5>
 			</div>
 
-			<div id="${ctxID}collapse" class="collapse show" aria-labelledby="${ctxID}head" data-parent="#accordion-dashboard-students">
+			<div id="${ctxID}collapse" class="collapse show" aria-labelledby="${ctxID}head" data-parent="#accordion-dashboard-subjects">
 				<div class="card-body"> 
 					<canvas id="${ctxID}"></canvas>
 				</div>
 			</div>
 		</div> 
-	`)
-
+	`) 
 	const ctx = document.getElementById(ctxID);  
 	new Chart(ctx, { 
 	  type: 'bar',
@@ -194,13 +246,13 @@ function generateBreakDownChart(ctxID,title,labels,mid,finals){
 				{
 					label: 'Mid',
 					// data: [1,2,3], 
-					data: mid,
+					data: [mid],
 					backgroundColor: getRandomColors()
 				},
 				{
 					label: 'Final',
 					// data:  [11,12,13], 
-					data:finals,
+					data:[finals],
 					backgroundColor: getRandomColors()
 				}
 			]
@@ -254,7 +306,7 @@ function getRandomColors(){
 		  ] 
   return "#"+array[Math.floor(Math.random() * array.length)];
 }
-function makeid(length) {
+function makeid(length=3) {
     let result = '';
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     const charactersLength = characters.length;
@@ -281,6 +333,32 @@ function _fetchSubjects()   {
 	};
 
 	ajaxQuery('fetch-subjects-dashboard', jsonData, '');
+	
+	setTimeout(() => { 
+		var rows = document.querySelectorAll("tr");
+		var i = 0 ;
+		rows.forEach(row => { 
+				i++;
+				if(i==1){return;}
+			row.addEventListener("click", function(ev) {
+				rows.forEach(r => {
+				r.style.background = "";
+				r.style.color = "";
+				}); 
+				this.style.setProperty('color', 'white', 'important');
+				this.style.setProperty('background', '#007BFF', 'important');
+			});
+		});
+		setTimeout(() => { 
+			var table = document.getElementById("DataTables_Table_0"); 
+			var rows = table.querySelectorAll("tr");
+			var i = 0 ;
+			rows.forEach(row => { 
+				i++;
+				if(i==2){row.click();} 
+			}); 
+		}, 500);
+	}, 100);
 }
 
 function _execWidgets() {

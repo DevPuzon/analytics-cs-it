@@ -177,25 +177,8 @@
 			foreach(SUBJECTS as $courseKey => $courses){ 
 				foreach($courses as $yearLevelKey => $yearLevels){ 
 					foreach($yearLevels as $semesterKey => $semesters){
-						foreach($semesters as $subjectKey => $subjects){
-							// foreach($subjects as $subject){
-							// }
-							$isFilter = false;
-							// if($sCourse != null && $sCourse == $courseKey){
-							// 	$isFilter = true;
-							// }else if($sCourse != null && $sCourse != $courseKey){
-							// 	$isFilter = false; 
-							// }
-							// if($sYear != null && $sYear == $yearLevelKey ){
-							// 	$isFilter = true;
-							// }else if($sYear != null && $sYear != $yearLevelKey ){
-							// 	$isFilter = false; 
-							// }
-							// if($sSem != null && $sSem == $semesterKey){
-							// 	$isFilter = true;
-							// }else if($sSem != null && $sSem != $semesterKey){
-							// 	$isFilter = false; 
-							// }
+						foreach($semesters as $subjectKey => $subjects){  
+							$isFilter = false; 
 							
 							if(($sCourse != null && $sCourse == $courseKey) &&
 							($sYear != null && $sYear == $yearLevelKey ) &&
@@ -204,9 +187,7 @@
 							}
 							else{ 
 								$isFilter = false; 
-							}
-
-
+							} 
 							if($sCourse == null && $sYear == null && $sSem == null){
 								$isFilter = true;
 							}
@@ -507,12 +488,19 @@
 			}
 		}
 
+		function capitalizeEachWord($str) {
+			$words = explode(" ", $str);
+			$capitalizedWords = array_map("ucfirst", $words);
+			return implode(" ", $capitalizedWords);
+		}
+
 		public function getSubjectAnalytics (){  
 			$course =	$this->input->post('course', TRUE); 
 			$year_level =	$this->input->post('year_level', TRUE); 
 			$semester =	$this->input->post('semester', TRUE); 
 			$subject_code =	$this->input->post('subject_code', TRUE);   
 			if (isset($course) && isset($year_level) && isset($semester)) {  
+
 				$qQuery = "SELECT *,AVG(mid_grade) as avgMid,AVG(final_grade) as avgFinal FROM `tbl_grades`WHERE "; 
 				$qQuery .= $course != "" ? " `course` = '".$course."'" : "";
 				$qQuery .= $year_level != "" ? " AND `year_level` = '".$year_level."'" : "";
@@ -520,16 +508,39 @@
 				$qQuery .= $subject_code != "" ? " AND `subject_code` = '".$subject_code."'" : ""; 
 				$fetchAvg	=	$this->earistlib->ExecQuery('', 'tbl_grades', $qQuery, '')->result_array();
 				
+				
+				$qQuery = "SELECT * FROM `tbl_grades` as gr left join `tbl_students` as st on st.student_no = gr.student_no WHERE "; 
+				$qQuery .= $course != "" ? " gr.`course` = '".$course."'" : "";
+				$qQuery .= $year_level != "" ? " AND gr.`year_level` = '".$year_level."'" : "";
+				$qQuery .= $semester != "" ? " AND gr.`semester` = '".$semester."'" : ""; 
+				$qQuery .= $subject_code != "" ? " AND gr.`subject_code` = '".$subject_code."'" : ""; 
+				$eFetchStGrades	=	$this->earistlib->ExecQuery('', 'tbl_grades', $qQuery, '')->result_array();
+				
+				$midGrades = [];
+				$finalGrades = [];
+				if(isset($eFetchStGrades)){
+					foreach($eFetchStGrades as $grade){
+						array_push($midGrades,array("full_name"=>$this->capitalizeEachWord($grade["first_name"]." ".$grade["middle_name"]),
+						"grade"=>$grade["mid_grade"],"student_no"=>$grade["student_no"]));
+						array_push($finalGrades,array("full_name"=>$this->capitalizeEachWord($grade["first_name"]." ".$grade["middle_name"]),
+						"grade"=>$grade["final_grade"],"student_no"=>$grade["student_no"]));
+					}
+				}
+				usort($midGrades, function ($a, $b) {
+					return $b['grade'] <=> $a['grade'];
+				}); 
+				usort($finalGrades, function ($a, $b) {
+					return $b['grade'] <=> $a['grade'];
+				}); 
 				echo json_encode(array(
 									"success"=>true,
 									"average_grade"=>isset($fetchAvg) ? $fetchAvg[0]:[],
+									"student_grades"=>array("midGrades"=>$midGrades,"finalGrades"=>$finalGrades),
 								));
 			}else{
 				echo json_encode(array("success"=>false));
 			}
-		}
-		
-
+		} 
 	}
 
 ?>

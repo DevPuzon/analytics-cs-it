@@ -7,6 +7,30 @@
     <div class="col-lg-6 col-6">&nbsp;</div>
 </div>
 <div class="row">
+    <div class="col-12 mb-4">
+        <div class="row">
+            <div class="col-md-3 col-sm-12">
+                <a href="<?php echo base_url()."dashboard-subjects";?>"
+                style="text-decoration:none;color: #000;">
+                    <div class="card "> 
+                        <div class="card-body"  >
+                            Subject Analysis
+                        </div>  
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3 col-sm-12">
+                <a href="<?php echo base_url()."dashboard-students";?>"
+                style="text-decoration:none;color: #000;">
+                    <div class="card "> 
+                        <div class="card-body"  >
+                            Student Analysis
+                        </div>  
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
     <div class="col-lg-6 col-6">
         <div class="small-box bg-info">
             <div class="inner">

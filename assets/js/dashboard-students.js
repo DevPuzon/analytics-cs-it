@@ -311,7 +311,7 @@ function getRandomColors(){
 		  ] 
   return "#"+array[Math.floor(Math.random() * array.length)];
 }
-function makeid(length) {
+function makeid(length=3) {
     let result = '';
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     const charactersLength = characters.length;
@@ -334,6 +334,30 @@ function _fetchStudents(sCourse)   {
 	var jsonData 	=	 {'year_level': $("#selYear").val(), 'semester': $("#selSem").val(), 'status' : $("#selStatus").val(), 'course' : $("#txtCourseType").val(), 'section': $("#selSection").val() };
 
 	ajaxQuery('fetch-students-dashboard', jsonData, '');
+	
+	setTimeout(() => { 
+		var rows = document.querySelectorAll("tr");
+			rows.forEach(row => {
+			row.addEventListener("click", function() {
+				rows.forEach(r => {
+				r.style.background = "";
+				r.style.color = "";
+				}); 
+				this.style.setProperty('color', 'white', 'important');
+				this.style.setProperty('background', '#007BFF', 'important');
+			});
+		});
+		
+		setTimeout(() => { 
+			var table = document.getElementById("DataTables_Table_0"); 
+			var rows = table.querySelectorAll("tr");
+			var i = 0 ;
+			rows.forEach(row => { 
+				i++;
+				if(i==2){row.click();} 
+			}); 
+		}, 500);
+	}, 100);
 }
 
 function _execWidgets() {

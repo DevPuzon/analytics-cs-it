@@ -31,6 +31,7 @@
 
 </head>
 <body class="sidebar-mini layout-fixed control-sidebar-slide-open" style="height: auto;">
+
 	<div class="wrapper">
 
 		<nav class="main-header navbar navbar-expand navbar-dark navbar-danger">
@@ -226,3 +227,5 @@
 <script src="assets/plugins/datatables-bs4/js/dataTables.bootstrap4.js"></script>
 <script src="assets/dist/js/adminlte.js"></script>
 <script src="assets/js/scripts.js"></script>
+
+ 
