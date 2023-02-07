@@ -61,6 +61,9 @@ $route['accounts']		= 'Modules/accounts';
 $route['dashboard']		= 'Modules/dashboard';
 $route['comscie']		= 'Modules/comscie';
 $route['dashboard-students']		= 'Modules/dashboardStudents';
+$route['dashboard-top-performer-students']		= 'Modules/dashboardTopPerformerStudents';
+
+
 $route['dashboard-subjects']		= 'Modules/dashboardSubjects'; 
 $route['it']		    = 'Modules/it';
 $route['grade-entry']	= 'Modules/grade_entry';
@@ -87,6 +90,7 @@ $route['portal_two'] 	= 'Login/portal_two';
 
 $route['fetch-students']	= 'Students/fetch_students';
 $route['fetch-students-dashboard']	= 'Students/fetch_students_dashboard';
+$route['fetch-top-performer-students-dashboard']	= 'Students/fetch_top_performer_students_dashboard';
 $route['fetch-subjects-dashboard']	= 'Students/fetch_subjects_dashboard';
 $route['student_analytics']	= 'Students/getStudentAnalytics';
 $route['subject_analytics']	= 'Students/getSubjectAnalytics';
@@ -94,6 +98,7 @@ $route['subject_analytics']	= 'Students/getSubjectAnalytics';
 
 $route['save-student']		= 'Students/save_student';
 $route['add-yrsem']		= 'Students/add_yrser';
+$route['delete-yrsem']		= 'Students/delete_yrser';
 $route['edit-student']		= 'Students/edit_student';
 $route['update-student']	= 'Students/update_student';
 $route['delete-student']	= 'Students/delete_student';

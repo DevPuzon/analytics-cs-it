@@ -14,7 +14,7 @@
                 style="text-decoration:none;color: #000;">
                     <div class="card "> 
                         <div class="card-body"  >
-                            Subject Analysis
+                            Subject Analytics
                         </div>  
                     </div>
                 </a>
@@ -24,7 +24,17 @@
                 style="text-decoration:none;color: #000;">
                     <div class="card "> 
                         <div class="card-body"  >
-                            Student Analysis
+                            Student Analytics
+                        </div>  
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3 col-sm-12">
+                <a href="<?php echo base_url()."dashboard-top-performer-students";?>"
+                style="text-decoration:none;color: #000;">
+                    <div class="card "> 
+                        <div class="card-body"  >
+                            Top Performer Students Analytics
                         </div>  
                     </div>
                 </a>
@@ -62,13 +72,13 @@
         <div class="card card-info">
             <div class="card-header">
                 <div class="d-flex justify-content-between">
-                    <h3 class="card-title"><i class="far fa-graph"></i> Analysis of Passing Grades - Computer Science</h3>
+                    <h3 class="card-title"><i class="far fa-graph"></i> Analytics of Passing Grades - Computer Science</h3>
                 </div>
             </div>
             <div class="card-body">
                 <div class="d-flex">
                     <p class="d-flex flex-column">
-                        <span>Analysis of Passing Grades Computer Science</span>
+                        <span>Analytics of Passing Grades Computer Science</span>
                     </p>
                 </div>
 
@@ -93,13 +103,13 @@
         <div class="card card-success">
                 <div class="card-header">
                     <div class="d-flex justify-content-between">
-                        <h3 class="card-title"><i class="far fa-graph"></i> Analysis of Passing Grades - Information Technology</h3>
+                        <h3 class="card-title"><i class="far fa-graph"></i> Analytics of Passing Grades - Information Technology</h3>
                     </div>
                 </div>
                 <div class="card-body">
                     <div class="d-flex">
                         <p class="d-flex flex-column">
-                            <span>Analysis of Passing Grades Information Technology</span>
+                            <span>Analytics of Passing Grades Information Technology</span>
                         </p>
                     </div>
 
@@ -128,7 +138,7 @@
         <div class="card card-info">
             <div class="card-header">
                 <div class="d-flex justify-content-between">
-                    <h3 class="card-title"><i class="far fa-graph"></i> Analysis of Failing Grades - Computer Science</h3>
+                    <h3 class="card-title"><i class="far fa-graph"></i> Analytics of Failing Grades - Computer Science</h3>
                 </div>
             </div>
             <div class="card-body">
@@ -155,7 +165,7 @@
         <div class="card card-success">
             <div class="card-header">
                 <div class="d-flex justify-content-between">
-                    <h3 class="card-title"><i class="far fa-graph"></i> Analysis of Failing Grades - Information Technology</h3>
+                    <h3 class="card-title"><i class="far fa-graph"></i> Analytics of Failing Grades - Information Technology</h3>
                 </div>
             </div>
             <div class="card-body">
@@ -193,6 +203,6 @@
 
 <script>
 
-    _createGraph(<?=$graph;?>);
+    // _createGraph(<?=$graph;?>);
 
 </script>

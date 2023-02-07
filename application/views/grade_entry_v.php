@@ -13,6 +13,8 @@ if(isset($_GET['year_level']) && isset($_GET['semester'])){
 		<div class="card">
 			<div class="card-header">
                 <input type="hidden" data-key="UniqueId" value="<?=$info['id'];?>">
+                <input type="hidden" data-key="UniqueStudentNo" value="<?=$info['student_no'];?>">
+                <input type="hidden" data-key="Course" value="<?=$info['course'];?>">
 				<div class="d-flex justify-content-between">
 	                <h3 class="card-title"><i class="fa fa-user-edit"></i> Student Information</h3>
                     <div class="card-tools">
@@ -79,22 +81,25 @@ if(isset($_GET['year_level']) && isset($_GET['semester'])){
         </button>
     </div>    
     <?php
-    foreach($enrolledCourses as $course){
+    foreach($enrolledCourses as $course){ 
         $isActive = false;
         if($course['year_level_coded'].$course['semester_coded'] == $year_level.$semester){
             $isActive = true;
         }
 
-        echo '<div class="col-md-3 col-sm-12">
-            <a href="'.base_url().'grade-entry?id='.$info['id'].'&year_level='.$course['year_level_coded'].'&semester='.$course['semester_coded'].'"
-            style="text-decoration:none;color: #000;">
-                <div class="card '.($isActive ? "bg-primary":"").'"> 
-                <div class="card-body" onclick="location">
-                    '.$course['year_level'].' Year - '.$course['semester'].' Semester 
+        echo "<div class='col-md-3 col-sm-12' style=' position: relative; '> 
+        <button type='button' class='btn btn-danger btn-sm' style=' position: absolute; right: 5%; top: 22%; z-index: 100; '
+        onclick=\"deleteCourseEnroll('".$course['id']."','".$course['year_level_coded']."','".$course['semester_coded']."','".$course['section']."')\"
+        ><i class='fa fa-trash'></i></button>
+        <a href=\"".base_url()."grade-entry?id=".$info['id']."&year_level=".$course['year_level_coded']."&semester=".$course['semester_coded']."&section=".$course['section']."\"
+        style='text-decoration:none;color: #000;'>
+            <div class='card ".($isActive ? 'bg-primary':'')."'> 
+                <div class='card-body' onclick='location'>
+                    ".$course['year_level']." Year - ".$course['semester']." Semester - ". $course['section']."
                 </div>  
-                </div>
-            </a>
-        </div>';
+            </div>
+        </a>
+    </div>";
     }
     ?>
 
@@ -227,7 +232,7 @@ if(isset($_GET['year_level']) && isset($_GET['semester'])){
         	<div class="modal-content">
           		<div class="modal-header">
 
-            		<h4 class="modal-title">Academic year and semester</h4>
+            		<h4 class="modal-title">Academic year, semester, and section</h4>
             		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 		                <span aria-hidden="true">×</span>
 		            </button>
@@ -249,13 +254,18 @@ if(isset($_GET['year_level']) && isset($_GET['semester'])){
                                         ?>
                                     </select>
                                 </div>
-                            </div> 
+                            </div>  
+							<div class="row">
+					      		<label class="control-label col-xs-3 col-sm-3 col-md-3 col-lg-3">Section<i class="fa fa-asterisk"></i></label>
+								<div class="form-group col-xs-9 col-sm-9 col-md-9 col-lg-9">
+					        		<input type="text" class="form-control input-sm" placeholder="Section" data="req" maxlength="35" data-key="Section">
+					      		</div>
+						    </div>
 						</div>
 					</div>
       			</div>
 
-      			<div class="modal-footer justify-content-between">
-      				<input type="hidden" data-key="UniqueId">
+      			<div class="modal-footer justify-content-between"> 
 	              	<button type="button" class="btn btn-outline-primary" data-trigger="add-yrsem">
 	              		<i class="fa fa-save"></i> Add
 	              	</button>

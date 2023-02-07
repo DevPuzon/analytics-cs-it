@@ -7,7 +7,17 @@ function getParameterByName(name, url = window.location.href) {
     return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
 
+function deleteCourseEnroll(courseID,year_level,semester,section){   
+    var student_no = $("[data-key=UniqueStudentNo]").val();  
+    var course = $("[data-key=Course]").val();
+    
+    var jsonData =	{ 'data' : JSON.stringify({year_level:year_level,
+        semester:semester,section:section,student_no:student_no,course:course}) };
+        
+    ajaxQuery('delete-yrsem', jsonData );
+}
 $(document).ready(function() {
+    
 	$("button").on('click', function (e) {
 		
 		e.preventDefault();
@@ -21,10 +31,11 @@ $(document).ready(function() {
             case 'add-yrsem':
                 var nUniqueId = $("[data-key=UniqueId]").val();
                 var yrSem = $("[data-key=Academic_year_and_semester]").val(); 
+                var section = $("[data-key=Section]").val(); 
                 if(!yrSem){return;} 
                 var year_level = yrSem.split(",")[0];
                 var semester =  yrSem.split(",")[1];
-                var jsonData =	{ 'data' : JSON.stringify({year_level:year_level,semester:semester}), 'id' : nUniqueId };
+                var jsonData =	{ 'data' : JSON.stringify({year_level:year_level,semester:semester,section:section}), 'id' : nUniqueId };
                 ajaxQuery('add-yrsem', jsonData, $(this));
             break;
             case 'cancel':
@@ -33,6 +44,7 @@ $(document).ready(function() {
 			case 'save-grades':
                 var year_level = getParameterByName('year_level') || null;
                 var semester = getParameterByName('semester') || null;
+                var section = getParameterByName('section') || null;
 
                 var nError = 0;
                 var aGrades = {};
@@ -57,10 +69,11 @@ $(document).ready(function() {
                     var jsonData =	{ 
                         'data' : JSON.stringify(aGrades), 
                         'id' : nUniqueId };
-                    if(year_level && semester){
+                    if(year_level && semester && section){
                         jsonData = Object.assign(jsonData,{
                             'year_level':year_level,
-                            'semester':semester});
+                            'semester':semester,
+                            'section':section});
                     } 
                     ajaxQuery('save-grades', jsonData, $(this));
                 }

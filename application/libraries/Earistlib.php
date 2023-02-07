@@ -230,7 +230,7 @@ include APPPATH.'third_party/phpmailer/class.phpmailer.php';
 
 	    	$eInfo	=	 $this->ExecQuery('', 'tbl_students', 'search', array("UniqueId" => $nIdno));
 	    	$aInfo 	=	 $eInfo->result_array();
-
+			
 	    	return $aInfo[0];
 
 	    }
@@ -748,38 +748,55 @@ include APPPATH.'third_party/phpmailer/class.phpmailer.php';
 			return "sds";
 		}
 
+		function findObjectInArray($array, $valueToFind) {
+			foreach ($array as $object) {
+			  foreach ($object as $property => $value) {
+				if ($value == $valueToFind) {
+				  return $object;
+				}
+			  }
+			}
+			return null;
+		}
+
 		public function availableYearSemester($sCourse,$nUniqueId){ 
-			$aStudentInfo 			=	$this->StudentInfo($nUniqueId);
+			$aStudentInfo 			=	$this->StudentInfo($nUniqueId); 
 			$studentCourseEnrollInfos 			=	$this->StudentCourseEnrollInfos($nUniqueId);
-			$enrolledCourses = [$aStudentInfo['year_level'].$aStudentInfo['semester']];
+			$enrolledCourses = [array("id"=>$aStudentInfo['year_level'].$aStudentInfo['semester'],
+			"section"=>$aStudentInfo['section'])];
+			
+			// echo "2".var_dump($studentCourseEnrollInfos);
 			foreach($studentCourseEnrollInfos as $data){
-				array_push($enrolledCourses,$data['year_level'].$data['semester']);
+				array_push($enrolledCourses,array(
+					"id"=>$data['id'],
+					"el_id"=>$data['year_level'].$data['semester'],
+					"section"=>$data['section']));
 			} 
 			$courseEnrolled = [];
-			$availables = [];
+			$availables = []; 
 			foreach(SUBJECTS[$sCourse] as $sYearLevel => $aSemSubs) { 
 				
 				foreach($aSemSubs as $sSemNo => $aSubDetails) { 
-							
-					if(!in_array($sYearLevel.$sSemNo, $enrolledCourses)){  
+					$eCourse = $this->findObjectInArray($enrolledCourses,$sYearLevel.$sSemNo);
+					if(!$eCourse){  
 						$availables[$sYearLevel.$sSemNo] = array(
 							"year_level"=>$this->getYearSemStr($sYearLevel),
 							"semester"=>$this->getYearSemStr($sSemNo),
 							"year_level_coded"=>$sYearLevel,
 							"semester_coded"=>$sSemNo
 						);
-					}else{
+					}else{ 
 						$courseEnrolled[$sYearLevel.$sSemNo] = array(
+							"id"=>$eCourse["id"],
 							"year_level"=>$this->getYearSemStr($sYearLevel),
 							"semester"=>$this->getYearSemStr($sSemNo),
+							"section"=>$eCourse["section"],
 							"year_level_coded"=>$sYearLevel,
 							"semester_coded"=>$sSemNo
 						);
 					}
 				}
 			}
-			 
-
 			return [$availables,$courseEnrolled];
 		}
 
@@ -1104,8 +1121,9 @@ include APPPATH.'third_party/phpmailer/class.phpmailer.php';
 				if ($sMidGrade > 0 && $sFinalGrade > 0) {
 					$fGradeAve = ($sMidGrade + $sFinalGrade) / 2;
 					$aGradeDet = gradeRangePoint($fGradeAve);
+					$nUnitsLec  = (int)$nUnitsLec;
 
-					$sGradexUnits = ( ($aGradeDet[1] > 0 ) ? ( $aGradeDet[1] * $nUnitsLec ) : 0);
+					$sGradexUnits = ( ((int)$aGradeDet[1] > 0 ) ? ( (int)$aGradeDet[1] * $nUnitsLec ) : 0);
 					if (isset($aGWA['grd'])) {
 						$aGWA['grd'] += $sGradexUnits;
 						$aGWA['unt'] += $nUnitsLec;
@@ -1123,7 +1141,161 @@ include APPPATH.'third_party/phpmailer/class.phpmailer.php';
 
 			return $aGWA['grd'] > 0 ? number_format($aGWA['grd'] / $aGWA['unt'], 2) : '';
 		}
+
+		public function getGWAv1($nId) {
+			$aStudentInfo 	=	$this->StudentInfo($nId);
+
+			$nStudenNo 	= $aStudentInfo['student_no'];
+			$nYearLevel = $aStudentInfo['year_level'];
+			$sSemester 	= $aStudentInfo['semester'];
+			$sSection 	= $aStudentInfo['section'];
+			$sCourse 	= $aStudentInfo['course'];
+			$sStat 		= $aStudentInfo['status'];
+
+			$grades = $this->Grades($nStudenNo);
+			$aGWA = [];
+			$aGWAList = [];
+			$aGrades = [];
+
+			if (sizeof($grades) > 0) {
+				foreach($grades as $nKey => $aGradeDetails) {
+					$aGrades[$aGradeDetails['course']][$aGradeDetails['year_level']][$aGradeDetails['semester']][$aGradeDetails['subject_code']] = $aGradeDetails['mid_grade']."|".$aGradeDetails['final_grade'];
+				}
+			}
+
+			$aSubjects  = SUBJECTS[$sCourse][$nYearLevel][$sSemester];
+
+			foreach($aSubjects as $sSubCode => $aDetails) {
+				$sSubject 	= $aDetails[0];
+				$nHrsLec 	= $aDetails[1];
+				$nHrsLab 	= $aDetails[2];
+				$nUnitsLec 	= $aDetails[3] != '' ? $aDetails[3] : '-';
+				$nUnitsLab 	= $aDetails[4] != '' ? $aDetails[4] : '-';
+				$nTotalUnits= $aDetails[5]; 
+
+				$aMidFinGrades = isset($aGrades[$sCourse][$nYearLevel][$sSemester][$sSubCode]) ? explode("|", $aGrades[$sCourse][$nYearLevel][$sSemester][$sSubCode]) : [0,0];
+
+				$sMidGrade = $aMidFinGrades > 0 ? $aMidFinGrades[0] : '';
+				$sFinalGrade = $aMidFinGrades > 0 ? $aMidFinGrades[1] : '';
+
+				if ($sMidGrade > 0 && $sFinalGrade > 0) {
+					$fGradeAve = ($sMidGrade + $sFinalGrade) / 2;
+					$aGradeDet = gradeRangePoint($fGradeAve);
+					$nUnitsLec  = (int)$nUnitsLec;
+					
+					$sGradexUnits = ( ((int)$aGradeDet[1] > 0 ) ? ( (int)$aGradeDet[1] * $nUnitsLec ) : 0);
+					if (isset($aGWA['grd'])) {
+						$aGWA['grd'] += $sGradexUnits;
+						$aGWA['unt'] += $nUnitsLec;
+					} else {
+						$aGWA['grd'] = $sGradexUnits;
+						$aGWA['unt'] = $nUnitsLec;
+					}
+
+				} else {
+					$aGradeDet = gradeRangePoint("");
+					$aGWA['grd'] = 0;
+					$aGWA['unt'] = 0;
+				}
+			}
+
+			return $aGWA['grd'] > 0 ? floatval(number_format($aGWA['grd'] / $aGWA['unt'], 2)) : 0;
+		}
+		
+		public function getGradePerCourse($student_no,$course,$year_level,$semester){ 
+			$aGWA = [];
+			$aGrades = [];
+			$data = [];
+			$grades =	$this->Grades($student_no); 
+			if(isset($year_level) && isset($semester)){
+				$grades 				=	$this->CustomGrades($student_no,$year_level,$semester); 
+			} 
+			
+			if (sizeof($grades) > 0) {
+				foreach($grades as $nKey => $aGradeDetails) {
+					$aGrades[$aGradeDetails['course']][$aGradeDetails['year_level']][$aGradeDetails['semester']][$aGradeDetails['subject_code']] = $aGradeDetails['mid_grade']."|".$aGradeDetails['final_grade'];
+				}
+			}
+
+			$aSubjects  = SUBJECTS[$course][$year_level][$semester]; 
+
+			foreach($aSubjects as $sSubCode => $aDetails) {
+				$sSubject 	= $aDetails[0];
+				$nHrsLec 	= $aDetails[1];
+				$nHrsLab 	= $aDetails[2];
+				$nUnitsLec 	= $aDetails[3] != '' ? $aDetails[3] : '-';
+				$nUnitsLab 	= $aDetails[4] != '' ? $aDetails[4] : '-';
+				$nTotalUnits= $aDetails[5]; 
+				
+				$aMidFinGrades = isset($aGrades[$course][$year_level][$semester][$sSubCode]) ? explode("|", $aGrades[$course][$year_level][$semester][$sSubCode]) : [0,0];
+
+				$sMidGrade = $aMidFinGrades > 0 ? $aMidFinGrades[0] : '';
+				$sFinalGrade = $aMidFinGrades > 0 ? $aMidFinGrades[1] : '';
+
+				if ($sMidGrade > 0 && $sFinalGrade > 0) {
+					$fGradeAve = ($sMidGrade + $sFinalGrade) / 2;
+					$aGradeDet = gradeRangePoint($fGradeAve);
+					$aGradeDet[1]= (int)$aGradeDet[1];
+					$nUnitsLec= (int)$nUnitsLec;
+
+					$sGradexUnits = ( ($aGradeDet[1] > 0 ) ? ($aGradeDet[1] * $nUnitsLec ) : 0);
+					if (isset($aGWA['grd'])) {
+						$aGWA['grd'] += $sGradexUnits;
+						$aGWA['unt'] += $nUnitsLec;
+					} else {
+						$aGWA['grd'] = $sGradexUnits;
+						$aGWA['unt'] = $nUnitsLec;
+					}
+
+				} else if($sMidGrade > 0 && $sFinalGrade <= 0) {
+					$aGradeDet = gradeRangePoint("inc");
+				} else {
+					$aGradeDet = gradeRangePoint("");
+					$aGWA['grd'] = 0;
+					$aGWA['unt'] = 0;
+				} 
+				$data[$sSubCode] = array(
+					"subject_code"=>$sSubCode,
+					"subject"=>$sSubject,
+					"mid"=>$sMidGrade,
+					"finals"=>$sFinalGrade,
+					"grade_point"=>$aGradeDet[1],
+				);
+			}
+			$gwa = floatval(( $aGWA['grd'] > 0 ? number_format($aGWA['grd'] / $aGWA['unt'], 2) : 0 ));
+			// $gwaFloat = floatval(( $aGWA['grd'] > 0 ? number_format($aGWA['grd'] / $aGWA['unt'], 2) : 0 ));
+			return [$gwa,$data];
+		} 
+
+		public function overAllGwa($student_no){
+			$query = "SELECT * FROM`tbl_grades` as gr left join `tbl_students` as st 
+			on st.student_no = gr.student_no WHERE gr.`student_no` = '$student_no' 
+			GROUP BY gr.`year_level`,gr.`semester`,gr.`section`";
+			$gwaList = []; 
+			$fetch	=	$this->ExecQuery('', 'tbl_grades', $query, '');
+			
+			$ifZeroGwa = 0;
+			if ($fetch->num_rows() > 0) {  
+				$fetch    =   $fetch->result_array();
+				foreach ($fetch as $key => $aValue) { 
+					$gwa = $this->getGradePerCourse($student_no,
+					$aValue["course"],
+					$aValue["year_level"],
+					$aValue["semester"] )[0];
+					if(!$gwa){
+						$ifZeroGwa = 1;
+					}else{ 
+						array_push($gwaList,$gwa);
+					}
+				}
+				echo $student_no."==".json_encode($gwaList)."<br>"
+				return $ifZeroGwa == 1 ? 0 : $ifZeroGwa.array_sum($gwaList)/sizeof($gwaList);
+			} else {
+				return 0;
+			} 
+		}
 	}
+
 
 	function gradeRangePoint($fGrade) {
 		if ($fGrade != "") {
@@ -1157,4 +1329,5 @@ include APPPATH.'third_party/phpmailer/class.phpmailer.php';
 		}
 	
 	}
+
 ?>

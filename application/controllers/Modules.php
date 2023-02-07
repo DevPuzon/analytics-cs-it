@@ -28,11 +28,11 @@ class Modules extends CI_Controller {
 
 	public function dashboard() {
 
-		$aGraph 	=	$this->earistlib->graphGrades();
+		// $aGraph 	=	$this->earistlib->graphGrades();
 		
 		$this->aHtml['title'] 	=	"Dashboard";
 		$this->aHtml['counts']	=	$this->earistlib->cntStudents();
-		$this->aHtml['graph'] 	=	json_encode($aGraph);
+		// $this->aHtml['graph'] 	=	json_encode($aGraph);
 		
 		$aViewData =   array("module" => $this->load->view("home_v", $this->aHtml, TRUE));
 		$this->load->view('main_v', $aViewData);
@@ -48,7 +48,7 @@ class Modules extends CI_Controller {
 	}
 
 	public function dashboardStudents() {
-		$this->aHtml['title'] 		=	"Students Dashboard";
+		$this->aHtml['title'] 		=	"Students Analytics";
 		$yearLevels = $this->earistlib->dropSubjects('it')[0]; 
 		$yearLevels = array_merge($yearLevels, $this->earistlib->dropSubjects('cs')[0]);
 
@@ -56,10 +56,19 @@ class Modules extends CI_Controller {
 		$aViewData              =   array("module" => $this->load->view("dashboard_students_v", $this->aHtml, TRUE)); 
 		$this->load->view('main_v', $aViewData);
 	}
+	
+	public function dashboardTopPerformerStudents() {
+		$this->aHtml['title'] 		=	"Top Performer Students Analytics";
+		$yearLevels = $this->earistlib->dropSubjects('it')[0]; 
+		$yearLevels = array_merge($yearLevels, $this->earistlib->dropSubjects('cs')[0]);
 
+		$this->aHtml['yearlevels'] 	=	$yearLevels;
+		$aViewData              =   array("module" => $this->load->view("dashboard_top_performer_students_v", $this->aHtml, TRUE)); 
+		$this->load->view('main_v', $aViewData);
+	} 
 	
 	public function dashboardSubjects() {
-		$this->aHtml['title'] 		=	"Subjects Dashboard";
+		$this->aHtml['title'] 		=	"Top Performer Students Analytics";
 		$yearLevels = $this->earistlib->dropSubjects('it')[0]; 
 		$yearLevels = array_merge($yearLevels, $this->earistlib->dropSubjects('cs')[0]);
 

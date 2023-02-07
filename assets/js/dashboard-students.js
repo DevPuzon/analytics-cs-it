@@ -82,7 +82,8 @@ $(document).ready(function() {
 			break;
 
 			case 'filter':
-				_fetchStudents();
+				_fetchStudents(); 
+				$("#accordion-dashboard-students").html("");
 			break;
 			
 			case 'cancel':
@@ -167,7 +168,7 @@ async function _studentAnalytics(id){
 		console.log(academic,academicKey);
 		var ctxID,title,labels=[],mid=[],finals=[];
 		ctxID = makeid(3);
-		title = `${academic.year_level} Year - ${academic.semester} Semester`;
+		title = `${academic.year_level} Year - ${academic.semester} Semester - ${academic.section}`;
 		for(let subjKey of Object.keys(academic.data)){
 			let subj = academic.data[subjKey];
 			labels.push(subj.subject_code);
@@ -349,7 +350,7 @@ function _fetchStudents(sCourse)   {
 		});
 		
 		setTimeout(() => { 
-			var table = document.getElementById("DataTables_Table_0"); 
+			var table = document.getElementsByTagName("table")[0]; 
 			var rows = table.querySelectorAll("tr");
 			var i = 0 ;
 			rows.forEach(row => { 

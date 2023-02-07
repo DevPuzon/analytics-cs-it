@@ -79,7 +79,7 @@
 			          	<li class="nav-item">
 			            	<a href="dashboard" class="nav-link">
 			              		<i class="nav-icon fas fa-tachometer-alt"></i>
-				              	<p> Dashboard </p>
+				              	<p> Analytics Dashboard </p>
 			            	</a>
 			        
 				        </li>

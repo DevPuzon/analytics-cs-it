@@ -1,6 +1,6 @@
 var sTabledata = "";
 $(document).ready(function() {
-	_fetchSubjects();
+	_fetchTopPerformerStudents();
 	$("button").on('click', function (e) {
 		
 		e.preventDefault();
@@ -69,7 +69,7 @@ $(document).ready(function() {
 
 			case 'print-cs':
 				var order = sTabledata.order();
-				var jsonData 	=	{'course' : 'cs', 'year_level': $("#selYear").val(), 'semester': $("#selSem").val(), 'status' : $("#selStatus").val(), '_fetchSubjects': $("#sel_fetchSubjects").val(), 'sortid' : order[0][0], 'sorttype': order[0][1] };
+				var jsonData 	=	{'course' : 'cs', 'year_level': $("#selYear").val(), 'semester': $("#selSem").val(), 'status' : $("#selStatus").val(), 'section': $("#selSection").val(), 'sortid' : order[0][0], 'sorttype': order[0][1] };
 				
 				ajaxQuery('extract-students', jsonData, $(this));
 			break;
@@ -82,11 +82,8 @@ $(document).ready(function() {
 			break;
 
 			case 'filter':
-				_fetchSubjects();
-				
-				$(`#grade-mid-dashboard-subjects`).html("");
-				$(`#grade-final-dashboard-subjects`).html("");
-				$("#accordion-dashboard-subjects").html(""); 
+				_fetchTopPerformerStudents(); 
+				$("#accordion-dashboard-students").html("");
 			break;
 			
 			case 'cancel':
@@ -155,74 +152,36 @@ function _delete(nId) {
 }
 
 
-async function _subjectAnalytics(id){
-	id = id.split("||");
-	var jsonData 	=	 {'course':id[0],'year_level':id[1],'semester':id[2],'subject_code':id[3]}; 
-	var res = await ajaxQuery('subject_analytics', jsonData, '');
+async function _studentTopPerformerAnalytics(id){
+	var jsonData 	=	 {'id':id}; 
+	var res = await ajaxQuery('student_analytics', jsonData, '');
 	console.log(res);
 	res = res.split(/(\r\n|\n|\r)/gm);
-	let dataRes = JSON.parse(res.splice(2,res.length).join("")); 
-	let average_grade= dataRes.average_grade;
-	let student_grades= dataRes.student_grades;
-	$("#accordion-dashboard-subjects").html(""); 
-	generateBreakDownChart(makeid(),"Total Average Grade Of Students",[id[4].replaceAll("*+^"," ")],
-	parseFloat(average_grade.avgMid).toFixed(2),
-	parseFloat(average_grade.avgFinal).toFixed(2));
-
-	generateLeaderboardTable(makeid(),"Mid Term - Student Grade List","mid",student_grades.midGrades);
-	generateLeaderboardTable(makeid(),"Final Term - Student Grade List","final",student_grades.finalGrades);
-}
-
-async function generateLeaderboardTable(ctxID,title,season,student_grades){
-	// await new Promise((resolve)=>{setTimeout(()=>{resolve()},1000)});
-	$(`#grade-${season}-dashboard-subjects`).html("");
-	let retStr=`<div class="card">
-	<div class="card-header" id="${ctxID}head">
-		<h5 class="mb-0">
-			<button class="btn btn-link" data-toggle="collapse" data-target="#${ctxID}collapse" aria-expanded="true" aria-controls="${ctxID}collapse">
-			${title}
-			</button>
-		</h5>
-	</div>
-
-	<div id="${ctxID}collapse" class="collapse show" aria-labelledby="${ctxID}head" data-parent="#accordion-dashboard-subjects">
-		<div class="card-body">  `;
-		
-	retStr+=`<table class='table table-hover table-striped ${season}-tbl-data'>
-	<thead>
-	<tr>
-		<th> Student No. </th>
-		<th> Name </th>
-		<th> Grade </th>
-	</tr>
-	</thead>
-	<tbody>
-	`;
-	student_grades.forEach((els)=>{
-		retStr += `<tr style=' cursor: pointer; '  >
-			<td> ${els.student_no} </td>
-			<td> ${els.full_name} </td>
-			<td> ${els.grade} </td>
-		</tr>`;
-	})
-	retStr+=`</tbody>
-			</table></div>
-			</div>
-		</div> `;
-console.log(retStr,`#grade-${season}-dashboard-subjects`);
-	$(`#grade-${season}-dashboard-subjects`).html(retStr);
-	$(`.${season}-tbl-data`).DataTable({
-		'paging': true,
-		'lengthChange': true,
-		'searching': true, 
-		'info' : true,
-		'autoWidth': false,
-	});
+	let dataRes = JSON.parse(res.splice(2,res.length).join("")).data; 
+	console.log(res);
+	let i = 0;
+	$("#accordion-dashboard-students").html("");
+	// totalGWAPerYearSemester
+	
+	for(let academicKey of Object.keys(dataRes)){
+		let academic = dataRes[academicKey];
+		console.log(academic,academicKey);
+		var ctxID,title,labels=[],mid=[],finals=[];
+		ctxID = makeid(3);
+		title = `${academic.year_level} Year - ${academic.semester} Semester`;
+		for(let subjKey of Object.keys(academic.data)){
+			let subj = academic.data[subjKey];
+			labels.push(subj.subject_code);
+			mid.push(subj.mid);
+			finals.push(subj.finals); 
+		}
+		generateBreakDownChart(ctxID,title+" Analytics",labels,mid,finals);
+		i++;
+	}
 }
 
 function generateBreakDownChart(ctxID,title,labels,mid,finals){ 
-	console.log(`generateBreakDownChart`,ctxID,title,labels,mid,finals); 
-	$("#accordion-dashboard-subjects").append(` 
+	$("#accordion-dashboard-students").append(` 
 		<div class="card">
 			<div class="card-header" id="${ctxID}head">
 				<h5 class="mb-0">
@@ -232,13 +191,14 @@ function generateBreakDownChart(ctxID,title,labels,mid,finals){
 				</h5>
 			</div>
 
-			<div id="${ctxID}collapse" class="collapse show" aria-labelledby="${ctxID}head" data-parent="#accordion-dashboard-subjects">
+			<div id="${ctxID}collapse" class="collapse show" aria-labelledby="${ctxID}head" data-parent="#accordion-dashboard-students">
 				<div class="card-body"> 
 					<canvas id="${ctxID}"></canvas>
 				</div>
 			</div>
 		</div> 
-	`) 
+	`)
+
 	const ctx = document.getElementById(ctxID);  
 	new Chart(ctx, { 
 	  type: 'bar',
@@ -250,13 +210,13 @@ function generateBreakDownChart(ctxID,title,labels,mid,finals){
 				{
 					label: 'Mid',
 					// data: [1,2,3], 
-					data: [mid],
+					data: mid,
 					backgroundColor: getRandomColors()
 				},
 				{
 					label: 'Final',
 					// data:  [11,12,13], 
-					data:[finals],
+					data:finals,
 					backgroundColor: getRandomColors()
 				}
 			]
@@ -281,7 +241,49 @@ function generateBreakDownChart(ctxID,title,labels,mid,finals){
 		  }
 	  },
 	}); 
-} 
+}
+
+function totalGWAPerYearSemester(ctxID){
+	let title = "Overall GWA Per Year And Semester";
+	const ctx = document.getElementById(ctxID);  
+	new Chart(ctx, { 
+		type: 'bar',
+		data: {
+			labels: labels,
+			datasets: [
+			  {
+				label: 'Dataset 1',
+				data: Utils.numbers(NUMBER_CFG),
+				backgroundColor: getRandomColors()
+			  },
+			  {
+				label: 'Dataset 2',
+				data: Utils.numbers(NUMBER_CFG),
+				backgroundColor: getRandomColors()
+			  }
+			]
+		  },
+		options: {
+		  indexAxis: 'y', 
+		  elements: {
+			bar: {
+			  borderWidth: 2,
+			}
+		  },
+		  responsive: true,
+		  plugins: {
+			legend: {
+			  position: 'right',
+			},
+			title: {
+			  display: true,
+			  text: 'Chart.js Horizontal Bar Chart'
+			}
+		  }
+		},
+	}); 
+}
+
 function getRandomColors(){
   let array =['F06292',
 			  'BA68C8',
@@ -328,23 +330,16 @@ function _conTinue(sAction, sObjData) {
     ajaxQuery('delete-student', {'data' : nUniqueId, 'course' : sCourse}, '');
 }
 
-function _fetchSubjects()   {
+function _fetchTopPerformerStudents(sCourse)   {
 
-	var jsonData 	=	 {
-		'year_level': $("#selYear").val() || null, 
-		'semester': $("#selSem").val() || null,  
-		'course' : $("#txtCourseType").val()   || null
-	};
+	var jsonData 	=	 {'year_level': $("#selYear").val(), 'semester': $("#selSem").val(), 'status' : $("#selStatus").val(), 'course' : $("#txtCourseType").val(), 'section': $("#selSection").val() };
 
-	ajaxQuery('fetch-subjects-dashboard', jsonData, '');
+	ajaxQuery('fetch-top-performer-students-dashboard', jsonData, '');
 	
 	setTimeout(() => { 
 		var rows = document.querySelectorAll("tr");
-		var i = 0 ;
-		rows.forEach(row => { 
-				i++;
-				if(i==1){return;}
-			row.addEventListener("click", function(ev) {
+			rows.forEach(row => {
+			row.addEventListener("click", function() {
 				rows.forEach(r => {
 				r.style.background = "";
 				r.style.color = "";
@@ -353,6 +348,7 @@ function _fetchSubjects()   {
 				this.style.setProperty('background', '#007BFF', 'important');
 			});
 		});
+		
 		setTimeout(() => { 
 			var table = document.getElementsByTagName("table")[0]; 
 			var rows = table.querySelectorAll("tr");

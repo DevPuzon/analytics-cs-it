@@ -26,6 +26,7 @@
             ){
                 $nYear          =   $this->input->post('year_level');
                 $sSemester      =   $this->input->post('semester');
+                $sSection      =   $this->input->post('section');
             }
             
             // $this->db->delete('tbl_grades', [
