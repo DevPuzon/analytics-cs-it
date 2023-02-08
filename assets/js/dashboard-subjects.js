@@ -89,6 +89,14 @@ $(document).ready(function() {
 				$("#accordion-dashboard-subjects").html(""); 
 			break;
 			
+			case 'print': 
+				$("#main-list").hide();
+				setTimeout(()=>{ 	
+					print(); 
+					$("#main-list").show();
+				},1000);  
+			break;
+
 			case 'cancel':
 				$('input').val('');
 				$('hidden').val('');
@@ -171,6 +179,7 @@ async function _subjectAnalytics(id){
 
 	generateLeaderboardTable(makeid(),"Mid Term - Student Grade List","mid",student_grades.midGrades);
 	generateLeaderboardTable(makeid(),"Final Term - Student Grade List","final",student_grades.finalGrades);
+	 
 }
 
 async function generateLeaderboardTable(ctxID,title,season,student_grades){
@@ -251,13 +260,13 @@ function generateBreakDownChart(ctxID,title,labels,mid,finals){
 					label: 'Mid',
 					// data: [1,2,3], 
 					data: [mid],
-					backgroundColor: getRandomColors()
+					//backgroundColor: getRandomColors()
 				},
 				{
 					label: 'Final',
 					// data:  [11,12,13], 
 					data:[finals],
-					backgroundColor: getRandomColors()
+					//backgroundColor: getRandomColors()
 				}
 			]
 		  }
@@ -338,13 +347,14 @@ function _fetchSubjects()   {
 
 	ajaxQuery('fetch-subjects-dashboard', jsonData, '');
 	
+	initialClickRow();
+}
+
+function initialClickRow (){ 
 	setTimeout(() => { 
 		var rows = document.querySelectorAll("tr");
-		var i = 0 ;
-		rows.forEach(row => { 
-				i++;
-				if(i==1){return;}
-			row.addEventListener("click", function(ev) {
+			rows.forEach(row => {
+			row.addEventListener("click", function() {
 				rows.forEach(r => {
 				r.style.background = "";
 				r.style.color = "";
@@ -353,6 +363,7 @@ function _fetchSubjects()   {
 				this.style.setProperty('background', '#007BFF', 'important');
 			});
 		});
+		
 		setTimeout(() => { 
 			var table = document.getElementsByTagName("table")[0]; 
 			var rows = table.querySelectorAll("tr");
@@ -362,7 +373,7 @@ function _fetchSubjects()   {
 				if(i==2){row.click();} 
 			}); 
 		}, 500);
-	}, 100);
+	}, 1000);
 }
 
 function _execWidgets() {

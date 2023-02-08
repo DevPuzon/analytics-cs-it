@@ -733,6 +733,9 @@ include APPPATH.'third_party/phpmailer/class.phpmailer.php';
 		}
 
 		function getYearSemStr($sYearLevel){ 
+			if(!$sYearLevel){ 
+				return "";
+			}
 			if(str_contains($sYearLevel, '1') || str_contains($sYearLevel, 'one')){
 				return 'First';
 			}
@@ -745,7 +748,7 @@ include APPPATH.'third_party/phpmailer/class.phpmailer.php';
 			if(str_contains($sYearLevel, '4')){
 				return 'Fourth';
 			}
-			return "sds";
+			return "";
 		}
 
 		function findObjectInArray($array, $valueToFind) {
@@ -1219,6 +1222,9 @@ include APPPATH.'third_party/phpmailer/class.phpmailer.php';
 
 			$aSubjects  = SUBJECTS[$course][$year_level][$semester]; 
 
+			$isInc = false;
+			$hasGrade = false;
+			$isNotQualified = false;
 			foreach($aSubjects as $sSubCode => $aDetails) {
 				$sSubject 	= $aDetails[0];
 				$nHrsLec 	= $aDetails[1];
@@ -1231,8 +1237,20 @@ include APPPATH.'third_party/phpmailer/class.phpmailer.php';
 
 				$sMidGrade = $aMidFinGrades > 0 ? $aMidFinGrades[0] : '';
 				$sFinalGrade = $aMidFinGrades > 0 ? $aMidFinGrades[1] : '';
+				if((!$sMidGrade || $sMidGrade == 0 || 
+				!$sFinalGrade || $sFinalGrade == 0) && $hasGrade){ 
+					$isInc = true;
+				} 
+
+				if(
+					( $sMidGrade > 0  && $sMidGrade <= 75) ||
+					( $sFinalGrade > 0  && $sFinalGrade <= 75)
+				){ 
+					$isNotQualified = true;
+				}
 
 				if ($sMidGrade > 0 && $sFinalGrade > 0) {
+					$hasGrade = true;
 					$fGradeAve = ($sMidGrade + $sFinalGrade) / 2;
 					$aGradeDet = gradeRangePoint($fGradeAve);
 					$aGradeDet[1]= (int)$aGradeDet[1];
@@ -1262,19 +1280,34 @@ include APPPATH.'third_party/phpmailer/class.phpmailer.php';
 					"grade_point"=>$aGradeDet[1],
 				);
 			}
-			$gwa = floatval(( $aGWA['grd'] > 0 ? number_format($aGWA['grd'] / $aGWA['unt'], 2) : 0 ));
+			$gwaL = 0;
+			if($isInc){
+				$gwa = "INC";
+			}else if($isNotQualified){
+				$gwa = "Not Qualified";
+				$gwaL = floatval(( $aGWA['grd'] > 0 ? number_format($aGWA['grd'] / $aGWA['unt'], 2) : 0 ));
+			}else{
+				$gwa = floatval(( $aGWA['grd'] > 0 ? number_format($aGWA['grd'] / $aGWA['unt'], 2) : 0 ));
+			}
+
+			// $gwa = $isInc ? "INC" : floatval(( $aGWA['grd'] > 0 ? number_format($aGWA['grd'] / $aGWA['unt'], 2) : 0 ));
 			// $gwaFloat = floatval(( $aGWA['grd'] > 0 ? number_format($aGWA['grd'] / $aGWA['unt'], 2) : 0 ));
-			return [$gwa,$data];
+			return [$gwa,$data,$gwaL];
 		} 
 
 		public function overAllGwa($student_no){
-			$query = "SELECT * FROM`tbl_grades` as gr left join `tbl_students` as st 
-			on st.student_no = gr.student_no WHERE gr.`student_no` = '$student_no' 
+			$query = "SELECT * FROM`tbl_students` as st 
+			left join `tbl_grades` as gr on gr.student_no = st.student_no 
+			WHERE gr.`student_no` = '$student_no' 
 			GROUP BY gr.`year_level`,gr.`semester`,gr.`section`";
+
 			$gwaList = []; 
-			$fetch	=	$this->ExecQuery('', 'tbl_grades', $query, '');
+			$fetch	=	$this->ExecQuery('', '', $query, '');
 			
-			$ifZeroGwa = 0;
+			$ifZeroGwa = false;
+			$isInc = false;
+			$isNotQualified = false;
+			
 			if ($fetch->num_rows() > 0) {  
 				$fetch    =   $fetch->result_array();
 				foreach ($fetch as $key => $aValue) { 
@@ -1282,14 +1315,34 @@ include APPPATH.'third_party/phpmailer/class.phpmailer.php';
 					$aValue["course"],
 					$aValue["year_level"],
 					$aValue["semester"] )[0];
-					if(!$gwa){
-						$ifZeroGwa = 1;
+
+					$gwaL = $this->getGradePerCourse($student_no,
+					$aValue["course"],
+					$aValue["year_level"],
+					$aValue["semester"] )[2];
+
+					if($gwa == "INC"){
+						$isInc = true;
+					}if($gwa == "Not Qualified"){
+						$isNotQualified = true;
+						array_push($gwaList,$gwaL);
+					}else if(!$gwa){
+						$ifZeroGwa = true;
 					}else{ 
 						array_push($gwaList,$gwa);
 					}
 				}
-				echo $student_no."==".json_encode($gwaList)."<br>"
-				return $ifZeroGwa == 1 ? 0 : $ifZeroGwa.array_sum($gwaList)/sizeof($gwaList);
+				// echo $student_no."==".json_encode($gwaList).json_encode($fetch)."<br>";
+				
+				if($isInc){
+					return "INC";
+				}else if($isNotQualified){
+					return "Not Qualified / ".number_format(array_sum($gwaList)/sizeof($gwaList), 2);
+				}else if($ifZeroGwa){ 
+					return 0;
+				}else {
+					return floatval(number_format(array_sum($gwaList)/sizeof($gwaList), 2));
+				}
 			} else {
 				return 0;
 			} 

@@ -32,7 +32,7 @@ $(document).ready(function() {
                 var nUniqueId = $("[data-key=UniqueId]").val();
                 var yrSem = $("[data-key=Academic_year_and_semester]").val(); 
                 var section = $("[data-key=Section]").val(); 
-                if(!yrSem){return;} 
+                if(!yrSem || !section){toastr.error('Please fill out all the required field.');return;} 
                 var year_level = yrSem.split(",")[0];
                 var semester =  yrSem.split(",")[1];
                 var jsonData =	{ 'data' : JSON.stringify({year_level:year_level,semester:semester,section:section}), 'id' : nUniqueId };

@@ -68,8 +68,7 @@ if(isset($_GET['year_level']) && isset($_GET['semester'])){
                         </dl>
                     </div>
                 </div>
-	        </div>
-            
+	        </div> 
 	    </div>
 	</div>
 </div>

@@ -7,6 +7,29 @@
     <div class="col-lg-6 col-6">&nbsp;</div>
 </div>
 <div class="row">
+    <div class="col-lg-6 col-6">
+        <div class="small-box bg-info">
+            <div class="inner">
+                <h3><?=(isset($counts['cs']) ? $counts['cs'] : 0);?></h3>
+                <p>Number of Students in Computer Science</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-users"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 col-6">
+        <div class="small-box bg-success">
+            <div class="inner">
+                <h3><?=(isset($counts['it']) ? $counts['it'] : 0);?></h3>
+                <p>Number of Students in Information Technology</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-stats-bars"></i>
+            </div>
+        </div>
+    </div>
     <div class="col-12 mb-4">
         <div class="row">
             <div class="col-md-3 col-sm-12">
@@ -39,34 +62,21 @@
                     </div>
                 </a>
             </div>
-        </div>
-    </div>
-    <div class="col-lg-6 col-6">
-        <div class="small-box bg-info">
-            <div class="inner">
-                <h3><?=(isset($counts['cs']) ? $counts['cs'] : 0);?></h3>
-                <p>Number of Students in Computer Science</p>
-            </div>
-            <div class="icon">
-                <i class="ion ion-users"></i>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-6 col-6">
-        <div class="small-box bg-success">
-            <div class="inner">
-                <h3><?=(isset($counts['it']) ? $counts['it'] : 0);?></h3>
-                <p>Number of Students in Information Technology</p>
-            </div>
-            <div class="icon">
-                <i class="ion ion-stats-bars"></i>
-            </div>
+            <div class="col-md-3 col-sm-12">
+                <a href="<?php echo base_url()."dashboard-failed-students";?>"
+                style="text-decoration:none;color: #000;">
+                    <div class="card "> 
+                        <div class="card-body"  >
+                            Failed Students Analytics
+                        </div>  
+                    </div>
+                </a>
+            </div> 
         </div>
     </div>
 </div>
 
-<div class="row">
+<!-- <div class="row">
     <div class="col-lg-6 col-6">
 
         <div class="card card-info">
@@ -187,7 +197,7 @@
         </div>
     </div>
 
-</div>
+</div> -->
 
 <script src="assets/plugins/jquery/jquery.min.3.6.js"></script>
 <script src="assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>

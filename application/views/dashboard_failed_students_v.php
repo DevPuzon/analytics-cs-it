@@ -121,4 +121,4 @@
   
 
 <script src="assets/plugins/jquery/jquery.min.js"></script>
-<script src="assets/js/dashboard-top-performer-students.js"></script>
+<script src="assets/js/dashboard-failed-students.js"></script>

@@ -204,6 +204,7 @@
 			$sHtml 			=	"<table class='table table-hover table-striped tbl-data'>
 									<thead>
 										<tr>
+											<th> # </th>
 											<th> Student No. </th>
 											<th> Name </th> 
 											<th> GWA </th> 
@@ -214,14 +215,19 @@
 			if ($eFetchStudents->num_rows() > 0) {
 
 				$aStudents    =   $eFetchStudents->result_array();
+				$i =1;
 				foreach ($aStudents as $key => $aValue) {
+					$sGwa = $this->earistlib->overAllGwa($aValue['student_no']);
+					if(!(is_numeric($sGwa) && $sGwa > 0)){continue;}
 
 					$sHtml 		.= "<tr style=' cursor: pointer; '
-									onclick=_studentTopPerformerAnalytics('".$aValue['id']."')>
+									onclick=_studentAnalytics('".$aValue['id']."')>
+									<td> ".$i." </td>  
 									<td> ".$aValue['student_no']." </td>
 									<td> ".$aValue['first_name']." ".$aValue['last_name']." </td>  
-									<td> ".$this->earistlib->overAllGwa($aValue['student_no'])." </td>  
+									<td> ".$sGwa." </td>  
 								</tr>"; 
+					$i++;
 				}
 
 
@@ -242,11 +248,99 @@
 				      'ordering': true,
 				      'info' : true,
 				      'autoWidth': false,
+					  order: [[3, 'asc']],
 				    });
 				    
 				";
 				// _exec();
 	    }   
+		
+	    public function fetch_failed_students_dashboard() {
+			$sCourse = $this->input->post('course');
+			$sYear = $this->input->post('year_level');
+			$sSem = $this->input->post('semester');
+			$sSec = $this->input->post('section');
+			$sStatus = $this->input->post('status');
+
+			
+
+			$qQuery = "SELECT * FROM `tbl_students` WHERE `deletedby` is null";
+
+			$qQuery .= $sCourse != "" ? " AND `course` = '".$sCourse."'" : "";
+			$qQuery .= $sYear != "" ? " AND `year_level` = '".$sYear."'" : "";
+			$qQuery .= $sSem != "" ? " AND `semester` = '".$sSem."'" : "";
+			$qQuery .= $sSec != "" ? " AND `section` = '".$sSec."'" : "";
+			$qQuery .= $sStatus != "" ? " AND `status` = '".$sStatus."'" : "";
+			
+			
+			// $qQuery = "SELECT * FROM`tbl_grades` as gr left join `tbl_students` as st on st.student_no = gr.student_no 
+			// WHERE st.`deletedby` is null";
+
+			// $qQuery .= $sCourse != "" ? " AND gr.`course` = '".$sCourse."'" : "";
+			// $qQuery .= $sYear != "" ? " AND gr.`year_level` = '".$sYear."'" : "";
+			// $qQuery .= $sSem != "" ? " AND gr.`semester` = '".$sSem."'" : "";
+			// $qQuery .= $sSec != "" ? " AND gr.`section` = '".$sSec."'" : "";
+			// $qQuery .= $sStatus != "" ? " AND st.`status` = '".$sStatus."'" : "";
+			// $qQuery .= " GROUP BY gr.`student_no`";   
+
+	    	$eFetchStudents	=	$this->earistlib->ExecQuery('', 'tbl_students', $qQuery, '');
+			
+			$sHtml 			=	"<table class='table table-hover table-striped tbl-data'>
+									<thead>
+										<tr>
+											<th> # </th>
+											<th> Student No. </th>
+											<th> Name </th> 
+											<th> GWA </th> 
+										</tr>
+									</thead>
+									<tbody>
+								";
+			if ($eFetchStudents->num_rows() > 0) {
+
+				$aStudents    =   $eFetchStudents->result_array();
+				$i =1;
+				foreach ($aStudents as $key => $aValue) {
+					$sGwa = $this->earistlib->overAllGwa($aValue['student_no']);
+					if(is_numeric($sGwa)){continue;}
+
+					$sHtml 	.= "<tr style=' cursor: pointer; '
+									onclick=_studentAnalytics('".$aValue['id']."')>
+									<td> ".$i." </td>  
+									<td> ".$aValue['student_no']." </td>
+									<td> ".$aValue['first_name']." ".$aValue['last_name']." </td>  
+									<td> ".$sGwa." </td>  
+								</tr>"; 
+					$i++;
+				}
+
+
+			} else {
+				$sHtml 		.= "<tr>
+									<td colspan='8'> No record found</td>
+								</tr>";
+			}
+
+			$sHtml 		.= "</tbody></table>";
+
+			echo "
+					$('#divData').html(\"".trim(preg_replace('/\s\s+/', '', $sHtml))."\");
+					sTabledata = $('.tbl-data').DataTable({
+				      'paging': true,
+				      'lengthChange': true,
+				      'searching': true,
+				      'ordering': true,
+				      'info' : true,
+				      'autoWidth': false,
+					  order: [[3, 'asc']],
+				    });
+				    
+				";
+				// _exec();
+	    }
+
+
+		
 		
 	    public function fetch_subjects_dashboard() {
 			$sCourse = $this->input->post('course');
@@ -516,7 +610,7 @@
 		public function getStudentAnalytics (){  
 			$nUniqueId =	$this->input->post('id', TRUE); 
 			if (isset($nUniqueId)) {
-				$data = [];
+				$data = ["avg_grade_timeline_analytics"=>[],"academic_analytics"=>[]];
 				$aStudentInfo 			=	$this->earistlib->StudentInfo($nUniqueId);
 				$student_no = $aStudentInfo['student_no'];
 				$course =	$aStudentInfo['course'];
@@ -527,14 +621,52 @@
 					$year_level = $enrolledCourse["year_level_coded"];
 					$semester =  $enrolledCourse["semester_coded"];
 					$gradePerCourse = $this->earistlib->getGradePerCourse($student_no,$course,$year_level,$semester );
-					$data[$enrolledCourse["year_level_coded"].$enrolledCourse["semester_coded"]] =
-					array( 
+					 
+					$data["academic_analytics"][$enrolledCourse["year_level_coded"].$enrolledCourse["semester_coded"]]=
+					array(
 						"year_level"=>$enrolledCourse["year_level"], 
 						"semester"=>$enrolledCourse["semester"],
 						"section"=>$enrolledCourse["section"],
 						"gwa"=>$gradePerCourse[0],
 						"data"=>$gradePerCourse[1]
 					);
+					// array_push(
+					// 	$data["academic_analytics"],  
+					// 	[$enrolledCourse["year_level_coded"].$enrolledCourse["semester_coded"]=>
+					// 	array(
+					// 		"year_level"=>$enrolledCourse["year_level"], 
+					// 		"semester"=>$enrolledCourse["semester"],
+					// 		"section"=>$enrolledCourse["section"],
+					// 		"gwa"=>$gradePerCourse[0],
+					// 		"data"=>$gradePerCourse[1]
+					// 	)]
+					// );
+				}
+				foreach($enrolledCourses as $enrolledCourse){
+					$year_level = $enrolledCourse["year_level_coded"];
+					$semester =  $enrolledCourse["semester_coded"];
+					$query = 'SELECT *,AVG(`mid_grade`) as midAvg, AVG(`final_grade`) as finalAvg 
+					FROM `tbl_grades` as gr 
+					WHERE `student_no` = "'.$student_no.'" 
+					AND `year_level` = "'.$year_level.'" 
+					and `semester` = "'.$semester.'";';
+					$fetchAvgs	=	$this->earistlib->ExecQuery('', 'tbl_grades', $query, '');
+				
+					if ($fetchAvgs->num_rows() > 0) {
+						$fetchAvgs    =   $fetchAvgs->result_array();
+						foreach ($fetchAvgs as $key => $fetchAvg) { 
+							array_push(
+								$data["avg_grade_timeline_analytics"], 
+								array( 
+									"year_level"=>$this->earistlib->getYearSemStr($fetchAvg["year_level"]), 
+									"semester"=>$this->earistlib->getYearSemStr($fetchAvg["semester"]),
+									"section"=>$fetchAvg["section"], 
+									"mid_avg"=>floatval(number_format($fetchAvg["midAvg"],2)),
+									"final_avg"=>floatval(number_format($fetchAvg["finalAvg"],2))
+								)
+							);
+						}
+					}
 				}
 				echo json_encode(array(
 									"success"=>true,
@@ -544,6 +676,70 @@
 				echo json_encode(array("success"=>false));
 			}
 		}
+
+		public function getStudentInfoHTML(){ 
+			$nUniqueId =	$this->input->post('id', TRUE); 
+			$html = "";
+			if (isset($nUniqueId)) {
+				$data = ["avg_grade_timeline_analytics"=>[],"academic_analytics"=>[]];
+				$info 			=	$this->earistlib->StudentInfo($nUniqueId); 
+				$this->aHtml['info'] 	=	$info ;
+				$html = $this->load->view("student_info_v", $this->aHtml, TRUE);
+			} 
+			
+			echo json_encode(array("html"=>$html));
+		}
+		
+		public function getTopPerformerStudentAnalytics (){  
+			$nUniqueId =	$this->input->post('id', TRUE); 
+			if (isset($nUniqueId)) {
+				$data = ["avg_grade_timeline_analytics"=>[]];
+				$aStudentInfo 			=	$this->earistlib->StudentInfo($nUniqueId);
+				$student_no = $aStudentInfo['student_no'];
+				$course =	$aStudentInfo['course'];
+
+				$enrolledCourses	=	$this->earistlib->availableYearSemester($aStudentInfo['course'],$nUniqueId)[1];
+				
+				foreach($enrolledCourses as $enrolledCourse){
+					$year_level = $enrolledCourse["year_level_coded"];
+					$semester =  $enrolledCourse["semester_coded"];
+					$query = 'SELECT *,AVG(`mid_grade`) as midAvg, AVG(`final_grade`) as finalAvg 
+					FROM `tbl_grades` as gr 
+					WHERE `student_no` = "'.$student_no.'" 
+					AND `year_level` = "'.$year_level.'" 
+					and `semester` = "'.$semester.'";';
+					$fetchAvgs	=	$this->earistlib->ExecQuery('', 'tbl_grades', $query, '');
+				
+					if ($fetchAvgs->num_rows() > 0) {
+						$fetchAvgs    =   $fetchAvgs->result_array();
+						foreach ($fetchAvgs as $key => $fetchAvg) { 
+							array_push(
+								$data["avg_grade_timeline_analytics"], 
+								array( 
+									"year_level"=>$this->earistlib->getYearSemStr($fetchAvg["year_level"]), 
+									"semester"=>$this->earistlib->getYearSemStr($fetchAvg["semester"]),
+									"section"=>$fetchAvg["section"], 
+									"mid_avg"=>floatval(number_format($fetchAvg["midAvg"],2)),
+									"final_avg"=>floatval(number_format($fetchAvg["finalAvg"],2))
+								)
+							);
+						}
+					}
+				}
+
+
+				echo json_encode(array(
+									"success"=>true,
+									"data"=>$data,
+								));
+			}else{
+				echo json_encode(array("success"=>false));
+			}
+		}
+
+
+
+		
 
 		function capitalizeEachWord($str) {
 			$words = explode(" ", $str);

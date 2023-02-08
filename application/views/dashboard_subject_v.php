@@ -3,7 +3,7 @@
 
 <script src="assets/plugins/chartjs.js/chartjs.js"></script> 
 <div class="row">
-	<div class="col-md-4">
+	<div class="col-md-4" id="main-list">
 
 		<div class="card">
 			<div class="card-header">
@@ -53,10 +53,19 @@
 						</div>
 					</div> 
 
-					<div class="col-md-1">
-					<button type="button" class="btn btn-sm btn-outline-primary" data-trigger="filter" style="height:80% !important; width: 60px;">
-						<i class="fas fa-filter"></i> Filter
-					</button>
+					<div class="col-md-12 mb-3">
+						<div class="row">
+							<div class="col-auto">
+								<button type="button" class="btn btn-sm btn-outline-primary" data-trigger="filter" >
+									<i class="fas fa-filter"></i> Filter
+								</button>
+							</div>
+							<div class="col-auto">
+								<button type="button" class="btn btn-sm btn-outline-primary" data-trigger="print" >
+									<i class="fas fa-print"></i> Print
+								</button>
+							</div>
+						</div>
 					</div>
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 table-responsive" id="divData"></div>
 	        	</div>
