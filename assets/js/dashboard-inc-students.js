@@ -1,5 +1,5 @@
 var sTabledata = "";
-$(document).ready(function() {
+$(document).ready(function() { 
 	_fetchStudents();
 	$("button").on('click', function (e) {
 		
@@ -161,7 +161,7 @@ function _delete(nId) {
 }
 
 
-async function _studentAnalytics(id){
+async function _studentAnalytics(id){ 
 	$("#accordion-dashboard-top-performer-students").html("");
 	$("#accordion-dashboard-students").html("");
 	var jsonData 	=	 {'id':id};    
@@ -244,13 +244,13 @@ function generateBreakDownChart(ctxID,title,labels,mid,finals){
 		  },
 		  responsive: true,
 		  plugins: {
-			legend: {
-				position: 'right',
-			},
-			title: {
+		  legend: {
+			  position: 'right',
+		  },
+		  title: {
 			  display: true,
 			  text:title
-		  	}
+		  }
 		  }
 	  },
 	}); 
@@ -435,8 +435,7 @@ function _fetchStudents()   {
 
 	var jsonData 	=	 {'year_level': $("#selYear").val(), 'semester': $("#selSem").val(), 'status' : $("#selStatus").val(), 'course' : $("#txtCourseType").val(), 'section': $("#selSection").val() };
 
-	ajaxQuery('fetch-top-performer-students-dashboard', jsonData, '');
-	
+	ajaxQuery('fetch-inc-students-dashboard', jsonData, '');
 	initialClickRow();
 }
 

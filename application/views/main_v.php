@@ -110,7 +110,7 @@
 				            </ul>
 				        </li>
 
-				        <li class="nav-item has-treeview">
+				        <li class="nav-item has-treeview" hidden>
 			            	<a href="#" class="nav-link">
 			              		<i class="nav-icon fas fa-user-tag"></i>
 				              	<p>

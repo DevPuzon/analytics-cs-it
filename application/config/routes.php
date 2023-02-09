@@ -63,6 +63,7 @@ $route['comscie']		= 'Modules/comscie';
 $route['dashboard-students']		= 'Modules/dashboardStudents';
 $route['dashboard-top-performer-students']		= 'Modules/dashboardTopPerformerStudents';
 $route['dashboard-failed-students']		= 'Modules/dashboardFailedStudents';
+$route['dashboard-inc-students']		= 'Modules/dashboardINCStudents';
 
 
 $route['dashboard-subjects']		= 'Modules/dashboardSubjects'; 
@@ -91,8 +92,10 @@ $route['portal_two'] 	= 'Login/portal_two';
 
 $route['fetch-students']	= 'Students/fetch_students';
 $route['fetch-students-dashboard']	= 'Students/fetch_students_dashboard';
+$route['passed_failed_students']	= 'Students/passed_failed_students'; 
 $route['fetch-top-performer-students-dashboard']	= 'Students/fetch_top_performer_students_dashboard'; 
 $route['fetch-failed-students-dashboard']	= 'Students/fetch_failed_students_dashboard';
+$route['fetch-inc-students-dashboard']	= 'Students/fetch_inc_students_dashboard';
 $route['fetch-subjects-dashboard']	= 'Students/fetch_subjects_dashboard';
 $route['student_analytics']	= 'Students/getStudentAnalytics';
 $route['get_student_info']	= 'Students/getStudentInfoHTML';

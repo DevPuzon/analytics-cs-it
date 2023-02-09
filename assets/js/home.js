@@ -1,4 +1,5 @@
 function _createGraph(sGraph) {
+  return;
 var { passedcs } = {...sGraph};
 var { failedcs } = {...sGraph};
 var { passedit } = {...sGraph};
@@ -321,3 +322,154 @@ var { failedit } = {...sGraph};
     });
   }
   
+
+
+$(document).ready(function() { 
+
+  totalNumberStudenstPerCourse();
+  
+  // Number of studens passed and failed
+  passedFailedStudentsQuery("","Students GWA Analytics"); 
+  // Number of studens in cs passed and failed
+  passedFailedStudentsQuery("cs","CS Students GWA Analytics");
+  // Number of studens in it passed and failed
+  passedFailedStudentsQuery("it","IT Students GWA Analytics");
+
+
+
+  async function passedFailedStudentsQuery(course="",title){
+    var jsonData 	=	 {'course' : course }; 
+    var res = await ajaxQuery('passed_failed_students', jsonData, ''); 
+    res = res.split(/(\r\n|\n|\r)/gm);
+    var dataRes = JSON.parse(res.splice(2,res.length).join(""));  
+    var passed = parseFloat(dataRes.passed);
+    var failed = parseFloat(dataRes.failed);
+    var inc = parseFloat(dataRes.inc);
+    generatePieChart(makeid(),title,["Passed","Failed","INC"],"GWA",[passed,failed,inc]);
+  } 
+
+  function totalNumberStudenstPerCourse(){ 
+    var noCs = $("[data-key=NoCs]").val(); 
+    var noIt = $("[data-key=NoIt]").val();
+    generatePieChart(makeid(),"No. Of Students Analytics",["CS","IT"],"No. Of Students",[parseFloat(noCs),parseFloat(noIt)]);
+  }
+
+
+  function generatePieChart(ctxID,title,labels,label,datasets){
+    console.log(ctxID,title,labels,label,datasets)  
+    $("#home-dashboard").append(` 
+      <div class="col-lg-3 col-sm-12 col-md-6">
+          <div class="card">
+          <div class="card-header" id="${ctxID}head">
+            <h5 class="mb-0">
+              <button class="btn btn-link" data-toggle="collapse" data-target="#${ctxID}collapse" aria-expanded="true" aria-controls="${ctxID}collapse">
+              ${title}
+              </button>
+            </h5>
+          </div>
+
+          <div id="${ctxID}collapse" class="collapse show" aria-labelledby="${ctxID}head" data-parent="#accordion-dashboard-subjects">
+            <div class="card-body"> 
+              <canvas id="${ctxID}"></canvas>
+            </div>
+          </div>
+        </div>
+      </div> 
+    `)  
+	const ctx = document.getElementById(ctxID);  
+  const sum = datasets.reduce((partialSum, a) => partialSum + a, 0); 
+
+  
+	new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: label,
+            data: datasets,
+            backgroundColor:getRandomColorsArr()
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          labels:{
+            render:(args)=>{
+              return `${args.label} : ${args.value} (${((100/sum)*args.value).toFixed(0)}%)`;
+            }
+          },
+          legend: {
+            position: 'top',
+          },
+          title: {
+            display: true,
+            text: title
+          }
+        }
+      },
+    }); 
+
+  }
+
+});
+
+function makeid(length=3) {
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  let counter = 0;
+  while (counter < length) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    counter += 1;
+  }
+  return result;
+}
+
+
+
+function getRandomColorsArr(){
+  // let arr =[];
+  // for(let i = 0 ; i<20;i++){
+  //   arr.push(getRandomColors());
+  // }
+  // return arr;
+  return [
+    "#059BFF",
+    "#FF416A",
+    "#22CFCF",
+    "#FFC337",
+    "#FF9021", 
+  ]
+}
+
+function getRandomColors(){
+  let array =['#F06292',
+			  '#FFA4C1',
+			  '#9575CD',
+			  '#4FC3F7',
+			  '#4DD0E1',
+			  '#4DB6AC',
+			  '#DCE775',
+			  '#FFD54F',
+			  '#D81B60',
+			  '#8E24AA',
+			  '#5E35B1',
+			  '#3949AB',
+			  '#039BE5',
+			  '#00ACC1',
+			  '#43A047',
+			  '#7CB342',
+			  '#FFB300',
+			  '#FB8C00',
+			  '#FBC02D',
+			  '#FFA000',
+			  '#059CFF',
+			  '#82CDFF',
+			  '#FF4069',
+			  '#FFA0B4'
+		  ] 
+      // return array;
+  return array[Math.floor(Math.random() * array.length)];
+}

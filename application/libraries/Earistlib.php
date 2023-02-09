@@ -1338,6 +1338,7 @@ include APPPATH.'third_party/phpmailer/class.phpmailer.php';
 					return "INC";
 				}else if($isNotQualified){
 					return "Not Qualified / ".number_format(array_sum($gwaList)/sizeof($gwaList), 2);
+					// return number_format(array_sum($gwaList)/sizeof($gwaList), 2);
 				}else if($ifZeroGwa){ 
 					return 0;
 				}else {

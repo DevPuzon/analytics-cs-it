@@ -109,19 +109,7 @@
 			$qQuery .= $sYear != "" ? " AND `year_level` = '".$sYear."'" : "";
 			$qQuery .= $sSem != "" ? " AND `semester` = '".$sSem."'" : "";
 			$qQuery .= $sSec != "" ? " AND `section` = '".$sSec."'" : "";
-			$qQuery .= $sStatus != "" ? " AND `status` = '".$sStatus."'" : "";
-
-
-			
-			// $qQuery = "SELECT * FROM`tbl_grades` as gr left join `tbl_students` as st on st.student_no = gr.student_no 
-			// WHERE st.`deletedby` is null";
-
-			// $qQuery .= $sCourse != "" ? " AND gr.`course` = '".$sCourse."'" : "";
-			// $qQuery .= $sYear != "" ? " AND gr.`year_level` = '".$sYear."'" : "";
-			// $qQuery .= $sSem != "" ? " AND gr.`semester` = '".$sSem."'" : "";
-			// $qQuery .= $sSec != "" ? " AND gr.`section` = '".$sSec."'" : "";
-			// $qQuery .= $sStatus != "" ? " AND st.`status` = '".$sStatus."'" : "";
-			// $qQuery .= " GROUP BY gr.`student_no`";   
+			$qQuery .= $sStatus != "" ? " AND `status` = '".$sStatus."'" : ""; 
 
 	    	$eFetchStudents	=	$this->earistlib->ExecQuery('', 'tbl_students', $qQuery, '');
 			
@@ -130,6 +118,7 @@
 										<tr>
 											<th> Student No. </th>
 											<th> Name </th> 
+											<th> GWA </th> 
 										</tr>
 									</thead>
 									<tbody>
@@ -139,11 +128,13 @@
 				$aStudents    =   $eFetchStudents->result_array();
 				
 				foreach ($aStudents as $key => $aValue) {
-
+					$sGwa = $this->earistlib->overAllGwa($aValue['student_no']);
+					if(str_contains($sGwa,"Not Qualified")){continue;}
 					$sHtml 		.= "<tr style=' cursor: pointer; '
 									onclick=_studentAnalytics('".$aValue['id']."')>
 									<td> ".$aValue['student_no']." </td>
 									<td> ".$aValue['first_name']." ".$aValue['last_name']." </td>  
+									<td> ".$sGwa." </td>  
 								</tr>"; 
 				}
 
@@ -164,7 +155,7 @@
 				      'searching': true,
 				      'ordering': true,
 				      'info' : true,
-				      'autoWidth': false,
+				      'autoWidth': false 
 				    });
 				    
 				";
@@ -186,17 +177,7 @@
 			$qQuery .= $sYear != "" ? " AND `year_level` = '".$sYear."'" : "";
 			$qQuery .= $sSem != "" ? " AND `semester` = '".$sSem."'" : "";
 			$qQuery .= $sSec != "" ? " AND `section` = '".$sSec."'" : "";
-			$qQuery .= $sStatus != "" ? " AND `status` = '".$sStatus."'" : "";
-			
-			
-			// $qQuery = "SELECT * FROM`tbl_grades` as gr left join `tbl_students` as st on st.student_no = gr.student_no 
-			// WHERE st.`deletedby` is null";
-
-			// $qQuery .= $sCourse != "" ? " AND gr.`course` = '".$sCourse."'" : "";
-			// $qQuery .= $sYear != "" ? " AND gr.`year_level` = '".$sYear."'" : "";
-			// $qQuery .= $sSem != "" ? " AND gr.`semester` = '".$sSem."'" : "";
-			// $qQuery .= $sSec != "" ? " AND gr.`section` = '".$sSec."'" : "";
-			// $qQuery .= $sStatus != "" ? " AND st.`status` = '".$sStatus."'" : "";
+			$qQuery .= $sStatus != "" ? " AND `status` = '".$sStatus."'" : ""; 
 			// $qQuery .= " GROUP BY gr.`student_no`";   
 
 	    	$eFetchStudents	=	$this->earistlib->ExecQuery('', 'tbl_students', $qQuery, '');
@@ -218,8 +199,8 @@
 				$i =1;
 				foreach ($aStudents as $key => $aValue) {
 					$sGwa = $this->earistlib->overAllGwa($aValue['student_no']);
-					if(!(is_numeric($sGwa) && $sGwa > 0)){continue;}
-
+					if(str_contains($sGwa,"Not Qualified")){continue;}
+					if(!(is_numeric($sGwa) && $sGwa > 0 && $sGwa < 3)){continue;} 
 					$sHtml 		.= "<tr style=' cursor: pointer; '
 									onclick=_studentAnalytics('".$aValue['id']."')>
 									<td> ".$i." </td>  
@@ -253,7 +234,65 @@
 				    
 				";
 				// _exec();
-	    }   
+	    }    
+
+		public function passed_failed_students(){ 
+			$sCourse = $this->input->post('course');
+			$sYear = $this->input->post('year_level');
+			$sSem = $this->input->post('semester');
+			$sSec = $this->input->post('section');
+			$sStatus = $this->input->post('status'); 
+			
+			$qQuery = "SELECT * FROM `tbl_students` WHERE `deletedby` is null"; 
+			$qQuery .= $sCourse != "" ? " AND `course` = '".$sCourse."'" : "";
+			$qQuery .= $sYear != "" ? " AND `year_level` = '".$sYear."'" : "";
+			$qQuery .= $sSem != "" ? " AND `semester` = '".$sSem."'" : "";
+			$qQuery .= $sSec != "" ? " AND `section` = '".$sSec."'" : "";
+			$qQuery .= $sStatus != "" ? " AND `status` = '".$sStatus."'" : ""; 
+		 
+	    	$eFetchStudents	=	$this->earistlib->ExecQuery('', 'tbl_students', $qQuery, '');
+			 
+			if ($eFetchStudents->num_rows() > 0) { 
+				$aStudents    =   $eFetchStudents->result_array();
+				$i =1;
+				$noInc = 0;
+				$noPassed = 0;
+				$noFailed = 0;
+				foreach ($aStudents as $key => $aValue) {
+					$sGwa = $this->earistlib->overAllGwa($aValue['student_no']); 
+					if(str_contains($sGwa,"Not Qualified")){
+						$sGwa = explode("Not Qualified / ",$sGwa)[1]; 
+					}
+
+					if(str_contains($sGwa,"INC")){
+						// INC
+						$noInc++;
+					}else if(is_numeric($sGwa) && $sGwa > 3){
+						// Failed
+						$noFailed++;
+					}else if(is_numeric($sGwa) && $sGwa > 0 && $sGwa <= 3){
+						// Passed
+						$noPassed++;
+					} 
+					$i++;
+				}  
+				echo json_encode(
+					array (
+						"passed"=>$noPassed,
+						"failed"=>$noFailed,
+						"inc"=>$noInc,
+					)
+				);
+			} else {
+				echo json_encode(
+					array (
+						"passed"=>0,
+						"failed"=>0,
+						"inc"=>0,
+					)
+				);
+			}
+		}
 		
 	    public function fetch_failed_students_dashboard() {
 			$sCourse = $this->input->post('course');
@@ -270,18 +309,7 @@
 			$qQuery .= $sYear != "" ? " AND `year_level` = '".$sYear."'" : "";
 			$qQuery .= $sSem != "" ? " AND `semester` = '".$sSem."'" : "";
 			$qQuery .= $sSec != "" ? " AND `section` = '".$sSec."'" : "";
-			$qQuery .= $sStatus != "" ? " AND `status` = '".$sStatus."'" : "";
-			
-			
-			// $qQuery = "SELECT * FROM`tbl_grades` as gr left join `tbl_students` as st on st.student_no = gr.student_no 
-			// WHERE st.`deletedby` is null";
-
-			// $qQuery .= $sCourse != "" ? " AND gr.`course` = '".$sCourse."'" : "";
-			// $qQuery .= $sYear != "" ? " AND gr.`year_level` = '".$sYear."'" : "";
-			// $qQuery .= $sSem != "" ? " AND gr.`semester` = '".$sSem."'" : "";
-			// $qQuery .= $sSec != "" ? " AND gr.`section` = '".$sSec."'" : "";
-			// $qQuery .= $sStatus != "" ? " AND st.`status` = '".$sStatus."'" : "";
-			// $qQuery .= " GROUP BY gr.`student_no`";   
+			$qQuery .= $sStatus != "" ? " AND `status` = '".$sStatus."'" : ""; 
 
 	    	$eFetchStudents	=	$this->earistlib->ExecQuery('', 'tbl_students', $qQuery, '');
 			
@@ -301,16 +329,20 @@
 				$aStudents    =   $eFetchStudents->result_array();
 				$i =1;
 				foreach ($aStudents as $key => $aValue) {
-					$sGwa = $this->earistlib->overAllGwa($aValue['student_no']);
-					if(is_numeric($sGwa)){continue;}
+					$sGwa = $this->earistlib->overAllGwa($aValue['student_no']); 
+					if(str_contains($sGwa,"Not Qualified")){
+						$sGwa = explode("Not Qualified / ",$sGwa)[1]; 
+					}
+					if(is_numeric($sGwa) && $sGwa > 3){
+						$sHtml 	.= "<tr style=' cursor: pointer; '
+										onclick=_studentAnalytics('".$aValue['id']."')>
+										<td> ".$i." </td>  
+										<td> ".$aValue['student_no']." </td>
+										<td> ".$aValue['first_name']." ".$aValue['last_name']." </td>  
+										<td> ".$sGwa." </td>  
+									</tr>"; 
+					}
 
-					$sHtml 	.= "<tr style=' cursor: pointer; '
-									onclick=_studentAnalytics('".$aValue['id']."')>
-									<td> ".$i." </td>  
-									<td> ".$aValue['student_no']." </td>
-									<td> ".$aValue['first_name']." ".$aValue['last_name']." </td>  
-									<td> ".$sGwa." </td>  
-								</tr>"; 
 					$i++;
 				}
 
@@ -339,7 +371,80 @@
 				// _exec();
 	    }
 
+	    public function fetch_inc_students_dashboard() {
+			$sCourse = $this->input->post('course');
+			$sYear = $this->input->post('year_level');
+			$sSem = $this->input->post('semester');
+			$sSec = $this->input->post('section');
+			$sStatus = $this->input->post('status');
 
+			
+
+			$qQuery = "SELECT * FROM `tbl_students` WHERE `deletedby` is null";
+
+			$qQuery .= $sCourse != "" ? " AND `course` = '".$sCourse."'" : "";
+			$qQuery .= $sYear != "" ? " AND `year_level` = '".$sYear."'" : "";
+			$qQuery .= $sSem != "" ? " AND `semester` = '".$sSem."'" : "";
+			$qQuery .= $sSec != "" ? " AND `section` = '".$sSec."'" : "";
+			$qQuery .= $sStatus != "" ? " AND `status` = '".$sStatus."'" : ""; 
+
+	    	$eFetchStudents	=	$this->earistlib->ExecQuery('', 'tbl_students', $qQuery, '');
+			
+			$sHtml 			=	"<table class='table table-hover table-striped tbl-data'>
+									<thead>
+										<tr>
+											<th> # </th>
+											<th> Student No. </th>
+											<th> Name </th> 
+											<th> GWA </th> 
+										</tr>
+									</thead>
+									<tbody>
+								";
+			if ($eFetchStudents->num_rows() > 0) {
+
+				$aStudents    =   $eFetchStudents->result_array();
+				$i =1;
+				foreach ($aStudents as $key => $aValue) {
+					$sGwa = $this->earistlib->overAllGwa($aValue['student_no']); 
+					if(str_contains($sGwa,"INC")){
+						$sHtml 	.= "<tr style=' cursor: pointer; '
+										onclick=_studentAnalytics('".$aValue['id']."')>
+										<td> ".$i." </td>  
+										<td> ".$aValue['student_no']." </td>
+										<td> ".$aValue['first_name']." ".$aValue['last_name']." </td>  
+										<td> ".$sGwa." </td>  
+									</tr>"; 
+					} 
+
+					$i++;
+				}
+
+
+			} else {
+				$sHtml 		.= "<tr>
+									<td colspan='8'> No record found</td>
+								</tr>";
+			}
+
+			$sHtml 		.= "</tbody></table>";
+
+			echo "
+					$('#divData').html(\"".trim(preg_replace('/\s\s+/', '', $sHtml))."\");
+					sTabledata = $('.tbl-data').DataTable({
+				      'paging': true,
+				      'lengthChange': true,
+				      'searching': true,
+				      'ordering': true,
+				      'info' : true,
+				      'autoWidth': false,
+					  order: [[3, 'asc']],
+				    });
+				    
+				";
+				// _exec();
+	    }
+		
 		
 		
 	    public function fetch_subjects_dashboard() {

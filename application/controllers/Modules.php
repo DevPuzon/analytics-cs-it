@@ -77,9 +77,21 @@ class Modules extends CI_Controller {
 		$aViewData              =   array("module" => $this->load->view("dashboard_failed_students_v", $this->aHtml, TRUE)); 
 		$this->load->view('main_v', $aViewData);
 	} 
+
+	
+	public function dashboardINCStudents() {
+		$this->aHtml['title'] 		=	"Incomplete Grades Student Analytics";
+		$yearLevels = $this->earistlib->dropSubjects('it')[0]; 
+		$yearLevels = array_merge($yearLevels, $this->earistlib->dropSubjects('cs')[0]);
+
+		$this->aHtml['yearlevels'] 	=	$yearLevels;
+		$aViewData              =   array("module" => $this->load->view("dashboard_inc_students_v", $this->aHtml, TRUE)); 
+		$this->load->view('main_v', $aViewData);
+	} 
+
 	
 	public function dashboardSubjects() {
-		$this->aHtml['title'] 		=	"Top Performer Students Analytics";
+		$this->aHtml['title'] 		=	"Subjects Analytics";
 		$yearLevels = $this->earistlib->dropSubjects('it')[0]; 
 		$yearLevels = array_merge($yearLevels, $this->earistlib->dropSubjects('cs')[0]);
 
