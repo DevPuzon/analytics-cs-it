@@ -18,6 +18,7 @@
             $sCourse        =   $aStudentInfo['course'];
             $nYear          =   $aStudentInfo['year_level'];
             $sSemester      =   $aStudentInfo['semester'];
+            $sAcademicYear      =   $aStudentInfo['academic_year'];
             $sSection       =   $aStudentInfo['section'];    
             
             if(
@@ -26,6 +27,7 @@
             ){
                 $nYear          =   $this->input->post('year_level');
                 $sSemester      =   $this->input->post('semester');
+                $sAcademicYear      =   $this->input->post('academicYear'); 
                 $sSection      =   $this->input->post('section');
             }
             
@@ -57,6 +59,7 @@
                 $aBatchData[] = [
                         'student_no' => $sStudentNo,
                         'year_level' => $nYear,
+                        'academic_year' => $sAcademicYear,
                         'semester' => $sSemester,
                         'course' => $sCourse,
                         'section' => $sSection,

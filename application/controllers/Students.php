@@ -17,6 +17,7 @@
 			$sSem = $this->input->post('semester');
 			$sSec = $this->input->post('section');
 			$sStatus = $this->input->post('status');
+			$sAcademic_year = $this->input->post('academic_year');
 
 			$qQuery = "SELECT * FROM `tbl_students` WHERE `deletedby` is null";
 
@@ -25,7 +26,8 @@
 			$qQuery .= $sSem != "" ? " AND `semester` = '".$sSem."'" : "";
 			$qQuery .= $sSec != "" ? " AND `section` = '".$sSec."'" : "";
 			$qQuery .= $sStatus != "" ? " AND `status` = '".$sStatus."'" : "";
-
+			$qQuery .= $sAcademic_year != "" ? " AND `academic_year` = '".$sAcademic_year."'" : "";
+			
 	    	$eFetchStudents	=	$this->earistlib->ExecQuery('', 'tbl_students', $qQuery, '');
 			
 			$sHtml 			=	"<table class='table table-hover table-striped tbl-data'>
@@ -102,6 +104,7 @@
 			$sSem = $this->input->post('semester');
 			$sSec = $this->input->post('section');
 			$sStatus = $this->input->post('status');
+			$sAcademic_year = $this->input->post('academic_year');
 
 			$qQuery = "SELECT * FROM `tbl_students` WHERE `deletedby` is null";
 
@@ -110,6 +113,7 @@
 			$qQuery .= $sSem != "" ? " AND `semester` = '".$sSem."'" : "";
 			$qQuery .= $sSec != "" ? " AND `section` = '".$sSec."'" : "";
 			$qQuery .= $sStatus != "" ? " AND `status` = '".$sStatus."'" : ""; 
+			$qQuery .= $sAcademic_year != "" ? " AND `academic_year` = '".$sAcademic_year."'" : ""; 
 
 	    	$eFetchStudents	=	$this->earistlib->ExecQuery('', 'tbl_students', $qQuery, '');
 			
@@ -168,6 +172,7 @@
 			$sSem = $this->input->post('semester');
 			$sSec = $this->input->post('section');
 			$sStatus = $this->input->post('status');
+			$sAcademic_year = $this->input->post('academic_year');
 
 			
 
@@ -178,6 +183,7 @@
 			$qQuery .= $sSem != "" ? " AND `semester` = '".$sSem."'" : "";
 			$qQuery .= $sSec != "" ? " AND `section` = '".$sSec."'" : "";
 			$qQuery .= $sStatus != "" ? " AND `status` = '".$sStatus."'" : ""; 
+			$qQuery .= $sAcademic_year != "" ? " AND `academic_year` = '".$sAcademic_year."'" : ""; 
 			// $qQuery .= " GROUP BY gr.`student_no`";   
 
 	    	$eFetchStudents	=	$this->earistlib->ExecQuery('', 'tbl_students', $qQuery, '');
@@ -300,6 +306,7 @@
 			$sSem = $this->input->post('semester');
 			$sSec = $this->input->post('section');
 			$sStatus = $this->input->post('status');
+			$sAcademic_year = $this->input->post('academic_year');
 
 			
 
@@ -310,6 +317,7 @@
 			$qQuery .= $sSem != "" ? " AND `semester` = '".$sSem."'" : "";
 			$qQuery .= $sSec != "" ? " AND `section` = '".$sSec."'" : "";
 			$qQuery .= $sStatus != "" ? " AND `status` = '".$sStatus."'" : ""; 
+			$qQuery .= $sAcademic_year != "" ? " AND `academic_year` = '".$sAcademic_year."'" : ""; 
 
 	    	$eFetchStudents	=	$this->earistlib->ExecQuery('', 'tbl_students', $qQuery, '');
 			
@@ -377,6 +385,7 @@
 			$sSem = $this->input->post('semester');
 			$sSec = $this->input->post('section');
 			$sStatus = $this->input->post('status');
+			$sAcademic_year = $this->input->post('academic_year');
 
 			
 
@@ -387,6 +396,7 @@
 			$qQuery .= $sSem != "" ? " AND `semester` = '".$sSem."'" : "";
 			$qQuery .= $sSec != "" ? " AND `section` = '".$sSec."'" : "";
 			$qQuery .= $sStatus != "" ? " AND `status` = '".$sStatus."'" : ""; 
+			$qQuery .= $sAcademic_year != "" ? " AND `academic_year` = '".$sAcademic_year."'" : ""; 
 
 	    	$eFetchStudents	=	$this->earistlib->ExecQuery('', 'tbl_students', $qQuery, '');
 			
@@ -532,7 +542,7 @@
 				'UserFname' => $aData['FirstName'],
 				'UserLname' => $aData['LastName'],
 				'UserEmail' => $aData['Email'],
-				'UserUname' => $aData['StudentNo'],
+				'UserUname' => $aData['StudentNo'], 
 				'UserPword' => md5($aData['StudentNo']),
 				'UserLevel' => 'student',
 				'UserStatus'=> 'active'
@@ -571,6 +581,7 @@
 					"YearLevel" => $aData['year_level'],
 					"Semester" => $aData['semester'],
 					"Section" => $aData['section'],
+					"AcademicYear" => $aData['academicYear']
 				)
 				, 'tbl_course_enroll', 'save', '');
 				 
@@ -710,8 +721,6 @@
 	    	echo "window.open('".$this->earistlib->GenPDF($sCourse, $sYear, $sSem, $sSec, $sStatus, $sSortBy, $sSort)."')";
 	    }
 
-
-		
 		public function getStudentAnalytics (){  
 			$nUniqueId =	$this->input->post('id', TRUE); 
 			if (isset($nUniqueId)) {

@@ -66,10 +66,10 @@
                     </div>
 
                     <div class="col-md-3">
-                        <button type="button" class="btn btn-sm btn-outline-danger" data-trigger="inc" style="height:80% !important; width: 60px;">
+                        <button type="button" class="btn btn-sm btn-outline-danger" data-trigger="inc" >
                             <i class="fas fa-print"></i> Print
                         </button>
-                        <button type="button" class="btn btn-sm btn-outline-success" data-trigger="notify-inc" style="height:80% !important; width: 60px;">
+                        <button type="button" class="btn btn-sm btn-outline-success" data-trigger="notify-inc" >
                             <i class="far fa-envelope"></i> Notify
                         </button>
                     </div>

@@ -160,7 +160,7 @@
 				                </a>
 				              </li>
 
-				              <li class="nav-item">
+				              <li class="nav-item" hidden>
 				                <a href="students" class="nav-link">
 				                  <i class="far fa-circle nav-icon"></i>
 				                  <p>Students</p>

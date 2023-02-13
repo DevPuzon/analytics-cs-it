@@ -86,6 +86,24 @@
 							</select>
 						</div>
 					</div>
+					
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="">Academic Year</label>
+                            
+							<select class="form-control form-control-sm" data="req" id="AcademicYear">
+								<option value = ''></option>
+							
+								<option value = '2020-2021'>2020-2021</option> 
+								<option value = '2021-2022'>2021-2022</option> 
+								<option value = '2022-2023'>2022-2023</option> 
+								<option value = '2023-2024'>2023-2024</option> 
+								<option value = '2024-2025'>2024-2025</option> 
+								<option value = '2025-2026'>2025-2026</option> 
+								<option value = '2026-2027'>2026-2027</option> 
+							</select>
+                        </div>
+                    </div>
 
 
 					<div class="col-md-12 mb-3">

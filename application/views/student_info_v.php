@@ -46,10 +46,16 @@
         </div>
 
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-3">
                 <dl>
                     <dt>Name</dt>
                     <dd> <?php echo ucwords(strtolower($info['last_name'].", ".$info['first_name']." ".$info['middle_name']));?></dd>
+                </dl>
+            </div>
+            <div class="col-md-3">
+                <dl>
+                    <dt>Academic Year</dt>
+                    <dd> <?=$info['academic_year'];?></dd>
                 </dl>
             </div>
             <div class="col-md-3">

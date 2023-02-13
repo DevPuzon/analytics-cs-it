@@ -52,10 +52,10 @@
                     </div>
 
                     <div class="col-md-3">
-                        <button type="button" class="btn btn-sm btn-outline-danger" data-trigger="dropped" style="height:80% !important; width: 60px;">
+                        <button type="button" class="btn btn-sm btn-outline-danger" data-trigger="dropped" >
                             <i class="fas fa-print"></i> Print
                         </button>
-                        <button type="button" class="btn btn-sm btn-outline-success" data-trigger="notify-dropped" style="height:80% !important; width: 60px;">
+                        <button type="button" class="btn btn-sm btn-outline-success" data-trigger="notify-dropped" >
                             <i class="far fa-envelope"></i> Notify
                         </button>
                     </div>

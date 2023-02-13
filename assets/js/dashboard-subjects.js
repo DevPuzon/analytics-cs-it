@@ -20,52 +20,7 @@ $(document).ready(function() {
 				$(".modal-title span").html("New");
 				$("#modalNewStudent").modal('show');
 			break;
-			
-			case 'save-cs':
-				var sCheckForm 	=	_checkFormFields(sForm);
-
-				if (sCheckForm == false) {
-					
-					toastr.error('Please complete the required fields.');
-
-				} else {
-					if ($("[data-key=UniqueId]").val() == "") {
-						var sData 		=	_collectFields(sForm);
-						var jsonData 	=	{'data' : sData, 'course' : 'cs'};
-						ajaxQuery('save-student', jsonData, $(this));
-					} else {
-						var sData 		=	_collectFields(sForm);
-						var jsonData 	=	{'data' : sData, 'id' : $("[data-key=UniqueId]").val()};
-						
-						ajaxQuery('update-student', jsonData, $(this));
-					}
-				}
-
-			break;
-
-
-			case 'save-it':
-				var sCheckForm 	=	_checkFormFields(sForm);
-
-				if (sCheckForm == false) {
-					
-					toastr.error('Please complete the required fields.');
-
-				} else {
-					if ($("[data-key=UniqueId]").val() == "") {
-						var sData 		=	_collectFields(sForm);
-						var jsonData 	=	{'data' : sData, 'course' : 'it'};
-						ajaxQuery('save-student', jsonData, $(this));
-					} else {
-						var sData 		=	_collectFields(sForm);
-						var jsonData 	=	{'data' : sData, 'id' : $("[data-key=UniqueId]").val()};
-						
-						ajaxQuery('update-student', jsonData, $(this));
-					}
-				}
-			
-
-			break;
+			 
 
 			case 'print-cs':
 				var order = sTabledata.order();
@@ -342,9 +297,9 @@ function _fetchSubjects()   {
 	var jsonData 	=	 {
 		'year_level': $("#selYear").val() || null, 
 		'semester': $("#selSem").val() || null,  
-		'course' : $("#txtCourseType").val()   || null
-	};
-
+		'course' : $("#txtCourseType").val()   || null,  
+		'academic_year' : $("#AcademicYear").val()   || null
+	}; 
 	ajaxQuery('fetch-subjects-dashboard', jsonData, '');
 	
 	initialClickRow();

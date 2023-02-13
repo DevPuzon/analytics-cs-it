@@ -55,10 +55,16 @@ if(isset($_GET['year_level']) && isset($_GET['semester'])){
                 </div>
 
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <dl>
                             <dt>Name</dt>
                             <dd> <?php echo ucwords(strtolower($info['last_name'].", ".$info['first_name']." ".$info['middle_name']));?></dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-3">
+                        <dl>
+                            <dt>Academic Year</dt>
+                            <dd> <?=$info['academic_year'];?></dd>
                         </dl>
                     </div>
                     <div class="col-md-3">
@@ -90,7 +96,7 @@ if(isset($_GET['year_level']) && isset($_GET['semester'])){
         <button type='button' class='btn btn-danger btn-sm' style=' position: absolute; right: 5%; top: 22%; z-index: 100; '
         onclick=\"deleteCourseEnroll('".$course['id']."','".$course['year_level_coded']."','".$course['semester_coded']."','".$course['section']."')\"
         ><i class='fa fa-trash'></i></button>
-        <a href=\"".base_url()."grade-entry?id=".$info['id']."&year_level=".$course['year_level_coded']."&semester=".$course['semester_coded']."&section=".$course['section']."\"
+        <a href=\"".base_url()."grade-entry?id=".$info['id']."&year_level=".$course['year_level_coded']."&semester=".$course['semester_coded']."&section=".$course['section']."&academicYear=".$course['academic_year']."\"
         style='text-decoration:none;color: #000;'>
             <div class='card ".($isActive ? 'bg-primary':'')."'> 
                 <div class='card-body' onclick='location'>
@@ -231,7 +237,7 @@ if(isset($_GET['year_level']) && isset($_GET['semester'])){
         	<div class="modal-content">
           		<div class="modal-header">
 
-            		<h4 class="modal-title">Academic year, semester, and section</h4>
+            		<h4 class="modal-title">Add Course</h4>
             		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 		                <span aria-hidden="true">×</span>
 		            </button>
@@ -240,7 +246,7 @@ if(isset($_GET['year_level']) && isset($_GET['semester'])){
             		<div class="row">
 						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12"> 
                             <div class="row">
-                                <label class="control-label col-xs-3 col-sm-3 col-md-3 col-lg-3">Academic year and semester<i class="fa fa-asterisk"></i></label>
+                                <label class="control-label col-xs-3 col-sm-3 col-md-3 col-lg-3">Year and semester<i class="fa fa-asterisk"></i></label>
                                 <div class="form-group col-xs-9 col-sm-9 col-md-9 col-lg-9">
                                     <select class="form-control input-sm" data="req" data-key="Academic_year_and_semester">
                                         <option value = ''></option>
@@ -251,6 +257,20 @@ if(isset($_GET['year_level']) && isset($_GET['semester'])){
                                         <?php
                                             }
                                         ?>
+                                    </select>
+                                </div>
+                            </div>  
+                            <div class="row">
+                                <label class="control-label col-xs-3 col-sm-3 col-md-3 col-lg-3">Academic Year<i class="fa fa-asterisk"></i></label>
+                                <div class="form-group col-xs-9 col-sm-9 col-md-9 col-lg-9">
+                                    <select class="form-control input-sm" data="req" data-key="AcademicYear"> 
+										<option value = '2020-2021' checked>2020-2021</option> 
+										<option value = '2021-2022'>2021-2022</option> 
+										<option value = '2022-2023'>2022-2023</option> 
+										<option value = '2023-2024'>2023-2024</option> 
+										<option value = '2024-2025'>2024-2025</option> 
+										<option value = '2025-2026'>2025-2026</option> 
+										<option value = '2026-2027'>2026-2027</option> 
                                     </select>
                                 </div>
                             </div>  

@@ -766,14 +766,17 @@ include APPPATH.'third_party/phpmailer/class.phpmailer.php';
 			$aStudentInfo 			=	$this->StudentInfo($nUniqueId); 
 			$studentCourseEnrollInfos 			=	$this->StudentCourseEnrollInfos($nUniqueId);
 			$enrolledCourses = [array("id"=>$aStudentInfo['year_level'].$aStudentInfo['semester'],
-			"section"=>$aStudentInfo['section'])];
+			"section"=>$aStudentInfo['section'],
+			"academic_year"=>$aStudentInfo['academic_year']
+			)];
 			
 			// echo "2".var_dump($studentCourseEnrollInfos);
 			foreach($studentCourseEnrollInfos as $data){
 				array_push($enrolledCourses,array(
 					"id"=>$data['id'],
 					"el_id"=>$data['year_level'].$data['semester'],
-					"section"=>$data['section']));
+					"section"=>$data['section'],
+					"academic_year"=>$data['academic_year']));
 			} 
 			$courseEnrolled = [];
 			$availables = []; 
@@ -794,6 +797,7 @@ include APPPATH.'third_party/phpmailer/class.phpmailer.php';
 							"year_level"=>$this->getYearSemStr($sYearLevel),
 							"semester"=>$this->getYearSemStr($sSemNo),
 							"section"=>$eCourse["section"],
+							"academic_year"=>$eCourse["academic_year"],
 							"year_level_coded"=>$sYearLevel,
 							"semester_coded"=>$sSemNo
 						);

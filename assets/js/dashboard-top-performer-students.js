@@ -20,52 +20,7 @@ $(document).ready(function() {
 				$(".modal-title span").html("New");
 				$("#modalNewStudent").modal('show');
 			break;
-			
-			case 'save-cs':
-				var sCheckForm 	=	_checkFormFields(sForm);
-
-				if (sCheckForm == false) {
-					
-					toastr.error('Please complete the required fields.');
-
-				} else {
-					if ($("[data-key=UniqueId]").val() == "") {
-						var sData 		=	_collectFields(sForm);
-						var jsonData 	=	{'data' : sData, 'course' : 'cs'};
-						ajaxQuery('save-student', jsonData, $(this));
-					} else {
-						var sData 		=	_collectFields(sForm);
-						var jsonData 	=	{'data' : sData, 'id' : $("[data-key=UniqueId]").val()};
-						
-						ajaxQuery('update-student', jsonData, $(this));
-					}
-				}
-
-			break;
-
-
-			case 'save-it':
-				var sCheckForm 	=	_checkFormFields(sForm);
-
-				if (sCheckForm == false) {
-					
-					toastr.error('Please complete the required fields.');
-
-				} else {
-					if ($("[data-key=UniqueId]").val() == "") {
-						var sData 		=	_collectFields(sForm);
-						var jsonData 	=	{'data' : sData, 'course' : 'it'};
-						ajaxQuery('save-student', jsonData, $(this));
-					} else {
-						var sData 		=	_collectFields(sForm);
-						var jsonData 	=	{'data' : sData, 'id' : $("[data-key=UniqueId]").val()};
-						
-						ajaxQuery('update-student', jsonData, $(this));
-					}
-				}
-			
-
-			break;
+			 
 
 			case 'print-cs':
 				var order = sTabledata.order();
@@ -433,8 +388,11 @@ function _conTinue(sAction, sObjData) {
 
 function _fetchStudents()   {
 
-	var jsonData 	=	 {'year_level': $("#selYear").val(), 'semester': $("#selSem").val(), 'status' : $("#selStatus").val(), 'course' : $("#txtCourseType").val(), 'section': $("#selSection").val() };
-
+	var jsonData 	=	 {'year_level': $("#selYear").val(), 
+	'semester': $("#selSem").val(), 'status' : $("#selStatus").val(), 
+	'course' : $("#txtCourseType").val(), 
+	'section': $("#selSection").val() , 
+	'academic_year': $("#AcademicYear").val()};
 	ajaxQuery('fetch-top-performer-students-dashboard', jsonData, '');
 	
 	initialClickRow();

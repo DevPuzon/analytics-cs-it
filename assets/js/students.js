@@ -158,7 +158,10 @@ function _conTinue(sAction, sObjData) {
 
 function _fetchStudents(sCourse)   {
 
-	var jsonData 	=	 {'year_level': $("#selYear").val(), 'semester': $("#selSem").val(), 'status' : $("#selStatus").val(), 'course' : $("#txtCourseType").val(), 'section': $("#selSection").val() };
+	var jsonData 	=	 {'year_level': $("#selYear").val(), 
+	'semester': $("#selSem").val(), 'status' : $("#selStatus").val(), 
+	'course' : $("#txtCourseType").val(), 'section': $("#selSection").val(),
+	'academic_year': $("#AcademicYear").val() };
 
 	ajaxQuery('fetch-students', jsonData, '');
 }

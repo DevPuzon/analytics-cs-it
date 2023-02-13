@@ -30,12 +30,14 @@ $(document).ready(function() {
             break;
             case 'add-yrsem':
                 var nUniqueId = $("[data-key=UniqueId]").val();
-                var yrSem = $("[data-key=Academic_year_and_semester]").val(); 
+                var yrSem = $("[data-key=Academic_year_and_semester]").val();
+                var academicYear = $("[data-key=AcademicYear]").val();  
+                
                 var section = $("[data-key=Section]").val(); 
                 if(!yrSem || !section){toastr.error('Please fill out all the required field.');return;} 
                 var year_level = yrSem.split(",")[0];
                 var semester =  yrSem.split(",")[1];
-                var jsonData =	{ 'data' : JSON.stringify({year_level:year_level,semester:semester,section:section}), 'id' : nUniqueId };
+                var jsonData =	{ 'data' : JSON.stringify({year_level:year_level,semester:semester,academicYear:academicYear,section:section}), 'id' : nUniqueId };
                 ajaxQuery('add-yrsem', jsonData, $(this));
             break;
             case 'cancel':
@@ -44,6 +46,7 @@ $(document).ready(function() {
 			case 'save-grades':
                 var year_level = getParameterByName('year_level') || null;
                 var semester = getParameterByName('semester') || null;
+                var academicYear = getParameterByName('academicYear') || null;
                 var section = getParameterByName('section') || null;
 
                 var nError = 0;
@@ -62,7 +65,7 @@ $(document).ready(function() {
                         aGrades[$(this).attr('data-key')] = $(input).val();
                     }
                 });
-
+                
                 if (nError > 0) {
                     toastr.error('Grades more than 100 is not Allowed');
                 } else {
@@ -73,6 +76,7 @@ $(document).ready(function() {
                         jsonData = Object.assign(jsonData,{
                             'year_level':year_level,
                             'semester':semester,
+                            'academicYear':academicYear,
                             'section':section});
                     } 
                     ajaxQuery('save-grades', jsonData, $(this));

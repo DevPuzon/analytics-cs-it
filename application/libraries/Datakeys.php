@@ -18,6 +18,7 @@
 			"FirstName"		=> 'first_name',
 			"MiddleName"	=> 'middle_name',
 			"LastName"		=> 'last_name',
+			"AcademicYear"		=> 'academic_year',
 			"YearLevel"		=> 'year_level',
 			"Semester"		=> 'semester',
 			"Section" 		=> 'section',
