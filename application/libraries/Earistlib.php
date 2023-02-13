@@ -1387,5 +1387,4 @@ include APPPATH.'third_party/phpmailer/class.phpmailer.php';
 		}
 	
 	}
-
 ?>

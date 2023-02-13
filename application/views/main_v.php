@@ -31,7 +31,6 @@
 
 </head>
 <body class="sidebar-mini layout-fixed control-sidebar-slide-open" style="height: auto;">
-
 	<div class="wrapper">
 
 		<nav class="main-header navbar navbar-expand navbar-dark navbar-danger">
