@@ -16,8 +16,11 @@ function deleteCourseEnroll(courseID,year_level,semester,section){
         
     ajaxQuery('delete-yrsem', jsonData );
 }
-$(document).ready(function() {
-    
+$(document).ready(function() { 
+    // var acad = getParameterByName("academicYear");
+    // if(acad){
+    //     document.getElementById("dynamic_academic_year").innerText = acad;
+    // }
 	$("button").on('click', function (e) {
 		
 		e.preventDefault();

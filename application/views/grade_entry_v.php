@@ -64,7 +64,7 @@ if(isset($_GET['year_level']) && isset($_GET['semester'])){
                     <div class="col-md-3">
                         <dl>
                             <dt>Academic Year</dt>
-                            <dd> <?=$info['academic_year'];?></dd>
+                            <dd id="dynamic_academic_year"> <?=$info['academic_year'];?></dd>
                         </dl>
                     </div>
                     <div class="col-md-3">
@@ -100,7 +100,7 @@ if(isset($_GET['year_level']) && isset($_GET['semester'])){
         style='text-decoration:none;color: #000;'>
             <div class='card ".($isActive ? 'bg-primary':'')."'> 
                 <div class='card-body' onclick='location'>
-                    ".$course['year_level']." Year - ".$course['semester']." Semester - ". $course['section']."
+                    ".$course['year_level']." Year - ".$course['semester']." Semester - ". $course['section']."- ". $course['academic_year']."
                 </div>  
             </div>
         </a>
@@ -302,3 +302,4 @@ if(isset($_GET['year_level']) && isset($_GET['semester'])){
 
 <script src="assets/plugins/jquery/jquery.min.js"></script>
 <script src="assets/js/grades.js"></script>
+ 

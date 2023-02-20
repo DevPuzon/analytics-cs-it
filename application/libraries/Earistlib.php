@@ -966,7 +966,7 @@ include APPPATH.'third_party/phpmailer/class.phpmailer.php';
 				if ($sType == "notify-top") {
 					$sHeader = "Top Performers";
 					$sGwa = "top";
-					$sContent= "Congratulations for your outstanding academic performance, you are one of the top performer in this semester. Your exceptional grades and achievements are a testament to your abilities and character.<br /><br />Please click the <a href='http://localhost:8080/earist_grading_student/certificate?idno=".$nStudenNo."'>here</a> to get your certificate.</a>";
+					$sContent= "Congratulations for your outstanding academic performance, you are one of the top performer in this semester. Your exceptional grades and achievements are a testament to your abilities and character.<br /><br />Please click the <a href='http://localhost/earist_grading_student/certificate?idno=".$nStudenNo."'>here</a> to get your certificate.</a>";
 				} else if ($sType == "notify-failed") {
 					$sHeader = "Failed Students";
 					$sGwa = "failed";
@@ -1227,8 +1227,10 @@ include APPPATH.'third_party/phpmailer/class.phpmailer.php';
 			$aSubjects  = SUBJECTS[$course][$year_level][$semester]; 
 
 			$isInc = false;
+			$isFailed = false;
 			$hasGrade = false;
 			$isNotQualified = false;
+			
 			foreach($aSubjects as $sSubCode => $aDetails) {
 				$sSubject 	= $aDetails[0];
 				$nHrsLec 	= $aDetails[1];
@@ -1240,18 +1242,35 @@ include APPPATH.'third_party/phpmailer/class.phpmailer.php';
 				$aMidFinGrades = isset($aGrades[$course][$year_level][$semester][$sSubCode]) ? explode("|", $aGrades[$course][$year_level][$semester][$sSubCode]) : [0,0];
 
 				$sMidGrade = $aMidFinGrades > 0 ? $aMidFinGrades[0] : '';
-				$sFinalGrade = $aMidFinGrades > 0 ? $aMidFinGrades[1] : '';
-				if((!$sMidGrade || $sMidGrade == 0 || 
-				!$sFinalGrade || $sFinalGrade == 0) && $hasGrade){ 
+				$sFinalGrade = $aMidFinGrades > 0 ? $aMidFinGrades[1] : ''; 
+
+				if ($sMidGrade > 0 && $sFinalGrade > 0) {
+					$hasGrade = true;
+				}
+			} 
+			foreach($aSubjects as $sSubCode => $aDetails) {
+				$sSubject 	= $aDetails[0];
+				$nHrsLec 	= $aDetails[1];
+				$nHrsLab 	= $aDetails[2];
+				$nUnitsLec 	= $aDetails[3] != '' ? $aDetails[3] : '-';
+				$nUnitsLab 	= $aDetails[4] != '' ? $aDetails[4] : '-';
+				$nTotalUnits= $aDetails[5]; 
+				
+				$aMidFinGrades = isset($aGrades[$course][$year_level][$semester][$sSubCode]) ? explode("|", $aGrades[$course][$year_level][$semester][$sSubCode]) : [0,0];
+
+				$sMidGrade = $aMidFinGrades > 0 ? $aMidFinGrades[0] : 0;
+				$sFinalGrade = $aMidFinGrades > 0 ? $aMidFinGrades[1] : 0;
+				if((  $sMidGrade == 0 || 
+				$sFinalGrade == 0) && true){ 
 					$isInc = true;
 				} 
 
-				if(
-					( $sMidGrade > 0  && $sMidGrade <= 75) ||
-					( $sFinalGrade > 0  && $sFinalGrade <= 75)
-				){ 
-					$isNotQualified = true;
-				}
+				// if(
+				// 	( $sMidGrade > 0  && $sMidGrade <= 75) ||
+				// 	( $sFinalGrade > 0  && $sFinalGrade <= 75)
+				// ){ 
+				// 	$isNotQualified = true;
+				// }
 
 				if ($sMidGrade > 0 && $sFinalGrade > 0) {
 					$hasGrade = true;
@@ -1283,10 +1302,22 @@ include APPPATH.'third_party/phpmailer/class.phpmailer.php';
 					"finals"=>$sFinalGrade,
 					"grade_point"=>$aGradeDet[1],
 				);
+				if($aGradeDet[1] > 3){
+					$isFailed = true;
+				}
+				
+				if(
+					$aGradeDet[1] >= 2.25
+				){  
+					$isNotQualified = true;
+				}
 			}
 			$gwaL = 0;
 			if($isInc){
 				$gwa = "INC";
+			}else if($isFailed){
+				$gwa = "Is Failed";
+				$gwaL = floatval(( $aGWA['grd'] > 0 ? number_format($aGWA['grd'] / $aGWA['unt'], 2) : 0 ));
 			}else if($isNotQualified){
 				$gwa = "Not Qualified";
 				$gwaL = floatval(( $aGWA['grd'] > 0 ? number_format($aGWA['grd'] / $aGWA['unt'], 2) : 0 ));
@@ -1311,6 +1342,7 @@ include APPPATH.'third_party/phpmailer/class.phpmailer.php';
 			$ifZeroGwa = false;
 			$isInc = false;
 			$isNotQualified = false;
+			$isFailed = false;
 			
 			if ($fetch->num_rows() > 0) {  
 				$fetch    =   $fetch->result_array();
@@ -1327,7 +1359,10 @@ include APPPATH.'third_party/phpmailer/class.phpmailer.php';
 
 					if($gwa == "INC"){
 						$isInc = true;
-					}if($gwa == "Not Qualified"){
+					}else if($gwa == "Is Failed"){
+						$isFailed = true;
+						array_push($gwaList,$gwaL);
+					}else if($gwa == "Not Qualified"){
 						$isNotQualified = true;
 						array_push($gwaList,$gwaL);
 					}else if(!$gwa){
@@ -1340,6 +1375,9 @@ include APPPATH.'third_party/phpmailer/class.phpmailer.php';
 				
 				if($isInc){
 					return "INC";
+				}else if($isFailed){
+					return "Is Failed / ".number_format(array_sum($gwaList)/sizeof($gwaList), 2);
+					// return number_format(array_sum($gwaList)/sizeof($gwaList), 2);
 				}else if($isNotQualified){
 					return "Not Qualified / ".number_format(array_sum($gwaList)/sizeof($gwaList), 2);
 					// return number_format(array_sum($gwaList)/sizeof($gwaList), 2);
@@ -1387,4 +1425,5 @@ include APPPATH.'third_party/phpmailer/class.phpmailer.php';
 		}
 	
 	}
+
 ?>

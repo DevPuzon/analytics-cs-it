@@ -61,6 +61,7 @@ $route['accounts']		= 'Modules/accounts';
 $route['dashboard']		= 'Modules/dashboard';
 $route['comscie']		= 'Modules/comscie';
 $route['dashboard-students']		= 'Modules/dashboardStudents';
+$route['model_dashboard']		= 'Modules/model_dashboard'; 
 $route['dashboard-top-performer-students']		= 'Modules/dashboardTopPerformerStudents';
 $route['dashboard-failed-students']		= 'Modules/dashboardFailedStudents';
 $route['dashboard-inc-students']		= 'Modules/dashboardINCStudents';

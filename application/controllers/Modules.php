@@ -11,11 +11,11 @@ class Modules extends CI_Controller {
 
     public function login() {
 		if ($this->session->userdata('uname') != "") {
-			$aGraph 	=	$this->earistlib->graphGrades();
+			// $aGraph 	=	$this->earistlib->graphGrades();
 			
 			$this->aHtml['title'] 	=	"Dashboard";
 			$this->aHtml['counts']	=	$this->earistlib->cntStudents();
-			$this->aHtml['graph'] 	=	json_encode($aGraph);
+			// $this->aHtml['graph'] 	=	json_encode($aGraph);
 			
 			$aViewData =   array("module" => $this->load->view("home_v", $this->aHtml, TRUE));
 			$this->load->view('main_v', $aViewData);
@@ -39,6 +39,17 @@ class Modules extends CI_Controller {
 
 	}
 
+	public function model_dashboard() {
+
+		// $aGraph 	=	$this->earistlib->graphGrades();
+		
+		$this->aHtml['title'] 	=	"Model dashboard"; 
+		// $this->aHtml['graph'] 	=	json_encode($aGraph);
+		
+		$aViewData =   array("module" => $this->load->view("dashboard_model_v", $this->aHtml, TRUE));
+		$this->load->view('main_v', $aViewData);
+
+	}
 	public function comscie() {
 		$this->aHtml['title'] 		=	"Computer Science Students";
 		$this->aHtml['yearlevels'] 	=	$this->earistlib->dropSubjects('cs')[0];

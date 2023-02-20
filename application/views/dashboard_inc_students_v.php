@@ -2,6 +2,7 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?> 
 
 <script src="assets/plugins/chartjs.js/chartjs.js"></script> 
+<script src="assets/js/knn-library.js"></script> 
 <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script> -->
 <div class="row">
 	<div class="col-md-5" id="main-list"> 
@@ -105,6 +106,14 @@
                         </div>
                     </div>
 
+                    <div class="col-md-3"> 
+						<div class="form-check">
+							<input type="checkbox" class="form-check-input" id="show-prediction"
+								
+							onchange="_studentAnalytics()">
+							<label class="form-check-label" for="show-prediction" >Show Prediction</label>
+						</div>
+                    </div> 
 
 					<div class="col-md-12 mb-3">
 						<div class="row">

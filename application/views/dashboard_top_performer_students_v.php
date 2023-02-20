@@ -1,6 +1,69 @@
 
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?> 
+ 
 
+<script src="assets/js/knn-library.js"></script> 
+<script>
+// function calc (){
+// 	let a = []; 
+// 	for(let i = 50; i <65;i++ ){
+// 		a.push(i);
+// 	}
+// 	let b = []; 
+// 	for(let i = 65; i <70;i++ ){
+// 		b.push(i);
+// 	}
+// 	let c = []; 
+// 	for(let i = 70; i <80;i++ ){
+// 		c.push(i);
+// 	}
+// 	let d = []; 
+// 	for(let i = 80; i <100;i++ ){
+// 		d.push(i);
+// 	}
+// 	return {datasets:[a,b,c,d],labels:[4,3,2,1]};
+// }
+
+// function calc (){
+// 	// let datasets = [];
+// 	// let datalabels = [];
+// 	// for(let i = 50; i < 101 ;i++){
+// 	// 	let a = [];
+// 	// 	for(let x = 10 ; x < 100; x++){
+// 	// 		a.push(parseFloat(`${i}.${x}`));
+// 	// 	}
+// 	// 	datasets.push(a);
+// 	// 	datalabels.push(i);
+// 	// } 
+	
+// 	return new Promise(async (resolve)=>{
+// 		const res = await fetch("assets/model.json", {
+// 		"headers": {
+// 			"accept": "*/*", 
+// 			"x-requested-with": "XMLHttpRequest"
+// 		}, 
+// 		"method": "POST" 
+// 		});
+// 		let data = JSON.parse(await res.text());
+// 		console.log(data);
+// 		resolve({datasets:data.datasets,labels:data.labels});
+// 	}) 
+// }
+
+// async function predictOutput(prod_datasets){
+	
+// 	var {datasets,labels} = await calc(); 
+// 	var knn = new KNN(datasets, labels, { k: 1 } ) 
+
+// 	// var test_dataset = [
+// 	// [75]
+// 	// ];
+
+//     console.log("predictOutput",prod_datasets);
+// 	return await knn.predict(prod_datasets); 
+// }  
+// console.log(predictOutput([75,57,90,100]));
+</script>
 <script src="assets/plugins/chartjs.js/chartjs.js"></script> 
 <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script> -->
 <div class="row">
@@ -104,7 +167,14 @@
 							</select>
                         </div>
                     </div>
-
+                    <div class="col-md-3"> 
+						<div class="form-check">
+							<input type="checkbox" class="form-check-input" id="show-prediction"
+								
+							onchange="_studentAnalytics()">
+							<label class="form-check-label" for="show-prediction" >Show Prediction</label>
+						</div>
+                    </div> 
 
 					<div class="col-md-12 mb-3">
 						<div class="row">

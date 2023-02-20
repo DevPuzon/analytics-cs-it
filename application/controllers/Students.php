@@ -114,12 +114,12 @@
 			$qQuery .= $sSec != "" ? " AND `section` = '".$sSec."'" : "";
 			$qQuery .= $sStatus != "" ? " AND `status` = '".$sStatus."'" : ""; 
 			$qQuery .= $sAcademic_year != "" ? " AND `academic_year` = '".$sAcademic_year."'" : ""; 
-
+			// echo $qQuery;
 	    	$eFetchStudents	=	$this->earistlib->ExecQuery('', 'tbl_students', $qQuery, '');
 			
 			$sHtml 			=	"<table class='table table-hover table-striped tbl-data'>
 									<thead>
-										<tr>
+										<tr> 
 											<th> Student No. </th>
 											<th> Name </th> 
 											<th> GWA </th> 
@@ -130,16 +130,30 @@
 			if ($eFetchStudents->num_rows() > 0) {
 
 				$aStudents    =   $eFetchStudents->result_array();
-				
+				$i =1;
 				foreach ($aStudents as $key => $aValue) {
 					$sGwa = $this->earistlib->overAllGwa($aValue['student_no']);
-					if(str_contains($sGwa,"Not Qualified")){continue;}
+					// if(str_contains($sGwa,"Not Qualified")){continue;}
+					
+					// $isFailed =false;
+					// if(str_contains($sGwa,"Is Failed")){
+					// 	$sGwa = explode("Is Failed / ",$sGwa)[1]; 
+					// 	$isFailed = true;
+					// }
+					if(str_contains($sGwa,"Not Qualified")){
+						$sGwa = explode("Not Qualified / ",$sGwa)[1]; 
+					} 
+					if(str_contains($sGwa,"Is Failed")){
+						$sGwa = explode("Is Failed / ",$sGwa)[1];  
+					}
 					$sHtml 		.= "<tr style=' cursor: pointer; '
 									onclick=_studentAnalytics('".$aValue['id']."')>
+								 
 									<td> ".$aValue['student_no']." </td>
 									<td> ".$aValue['first_name']." ".$aValue['last_name']." </td>  
 									<td> ".$sGwa." </td>  
 								</tr>"; 
+								$i++;
 				}
 
 
@@ -166,6 +180,8 @@
 				// _exec();
 	    } 
 		
+
+		// GET STUDENT TOP PERFORMER
 	    public function fetch_top_performer_students_dashboard() {
 			$sCourse = $this->input->post('course');
 			$sYear = $this->input->post('year_level');
@@ -203,17 +219,26 @@
 
 				$aStudents    =   $eFetchStudents->result_array();
 				$i =1;
+				$pastGwa = 0;
 				foreach ($aStudents as $key => $aValue) {
 					$sGwa = $this->earistlib->overAllGwa($aValue['student_no']);
-					if(str_contains($sGwa,"Not Qualified")){continue;}
+					if(str_contains($sGwa,"Not Qualified") || 
+					   str_contains($sGwa,"Is Failed")){continue;}  
 					if(!(is_numeric($sGwa) && $sGwa > 0 && $sGwa < 3)){continue;} 
+					
 					$sHtml 		.= "<tr style=' cursor: pointer; '
 									onclick=_studentAnalytics('".$aValue['id']."')>
 									<td> ".$i." </td>  
 									<td> ".$aValue['student_no']." </td>
 									<td> ".$aValue['first_name']." ".$aValue['last_name']." </td>  
 									<td> ".$sGwa." </td>  
-								</tr>"; 
+								</tr>";  
+					// if($sGwa != $pastGwa){
+					// 	$i++;
+					// 	$pastGwa = $sGwa;
+					// }else{ 
+					// 	$pastGwa = $sGwa;
+					// }
 					$i++;
 				}
 
@@ -269,11 +294,15 @@
 					if(str_contains($sGwa,"Not Qualified")){
 						$sGwa = explode("Not Qualified / ",$sGwa)[1]; 
 					}
-
+					$isFailed =false;
+					if(str_contains($sGwa,"Is Failed")){
+						$sGwa = explode("Is Failed / ",$sGwa)[1]; 
+						$isFailed = true;
+					} 
 					if(str_contains($sGwa,"INC")){
 						// INC
 						$noInc++;
-					}else if(is_numeric($sGwa) && $sGwa > 3){
+					}else if($isFailed){
 						// Failed
 						$noFailed++;
 					}else if(is_numeric($sGwa) && $sGwa > 0 && $sGwa <= 3){
@@ -341,7 +370,13 @@
 					if(str_contains($sGwa,"Not Qualified")){
 						$sGwa = explode("Not Qualified / ",$sGwa)[1]; 
 					}
-					if(is_numeric($sGwa) && $sGwa > 3){
+					$isFailed =false;
+					if(str_contains($sGwa,"Is Failed")){
+						$sGwa = explode("Is Failed / ",$sGwa)[1]; 
+						$isFailed = true;
+					}
+					// if(is_numeric($sGwa) && $sGwa > 3){
+					if($isFailed){
 						$sHtml 	.= "<tr style=' cursor: pointer; '
 										onclick=_studentAnalytics('".$aValue['id']."')>
 										<td> ".$i." </td>  
@@ -559,7 +594,7 @@
 
 	    				echo "
 	    						$('input').val('');
-								$('hidden').val('');
+								F$('hidden').val('');
 								$('select').val('');
 								toastr.success('Student successfully added.');
 								_fetchStudents('".$aData['Course']."');

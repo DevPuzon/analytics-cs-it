@@ -115,7 +115,10 @@ function _delete(nId) {
 }
 
 
-async function _studentAnalytics(id){ 
+let currentStudentId = null;
+async function _studentAnalytics(id= currentStudentId){
+	console.log("_studentAnalytics",id);
+	currentStudentId = id;
 	$("#accordion-dashboard-top-performer-students").html("");
 	$("#accordion-dashboard-students").html("");
 	var jsonData 	=	 {'id':id};    
@@ -209,18 +212,97 @@ function generateBreakDownChart(ctxID,title,labels,mid,finals){
 	  },
 	}); 
 }
-
-function calcTopPerformer(dataRes){
+var listAcads = [
+	{
+		year_level:"First",
+		semester:"First",
+	},
+	{
+		year_level:"First",
+		semester:"Second",
+	},
+	
+	{
+		year_level:"Second",
+		semester:"First",
+	},
+	{
+		year_level:"Second",
+		semester:"Second",
+	},
+	
+	{
+		year_level:"Third",
+		semester:"First",
+	},
+	{
+		year_level:"Third",
+		semester:"Second",
+	},
+	
+	{
+		year_level:"Fourth",
+		semester:"First",
+	},
+	{
+		year_level:"Fourth",
+		semester:"Second",
+	}
+]
+async function calcTopPerformer(dataRes){
+	let mMid=[],mFinals=[],mMidFinalAvgs=[];
 	var title,labels=[],mid=[],finals=[],midFinalAvgs=[]; 
 	title = `Student Performer`;
-	for(let avg of dataRes.avg_grade_timeline_analytics){
-		labels.push(`${avg.year_level} Year - ${avg.semester} Semester`);
-		midFinalAvgs.push((avg.mid_avg+avg.final_avg)/2); 
-		mid.push(avg.mid_avg);
-		finals.push(avg.final_avg); 
-	} 
+	
+	for(let acads of listAcads){ 
+		// for(let avg of dataRes.avg_grade_timeline_analytics){  
+		// }
+		let avg = dataRes.avg_grade_timeline_analytics.find((el)=>{
+			return el.year_level+"-"+el.semester == acads.year_level+"-"+acads.semester});
+		console.log("calcTopPerformer",avg) ;
+		if(!avg && document.getElementById("show-prediction").checked){
+			// if(!avg ){
+			labels.push(`Predict ${acads.year_level} Year - ${acads.semester} Semester`); 
+ 
+			if(midFinalAvgs.length > 0 ){
+				midFinalAvgs.push(await predictOutput(mMidFinalAvgs)); 
+				mid.push(await predictOutput(mMid));
+				finals.push(await predictOutput(mFinals));
+			}else{ 
+				midFinalAvgs.push(0); 
+				mid.push(0);
+				finals.push(0);
+			}
+
+		}else if(avg){
+			labels.push(`${avg.year_level} Year - ${avg.semester} Semester`);
+			console.log("calcTopPerformer2",avg);
+			midFinalAvgs.push((avg.mid_avg+avg.final_avg)/2); 
+			mid.push(avg.mid_avg);
+			finals.push(avg.final_avg);	 
+		}
+		
+		
+		mMid = mMid.concat(mid);
+		mMidFinalAvgs = mMidFinalAvgs.concat(midFinalAvgs);
+		mFinals = mFinals.concat(finals);
+	}
+
+	console.log("_studentAnalytics",title+" Analytics",labels,mid,finals,midFinalAvgs); 
 	generateTopPerformerBreakDownChart(makeid(),title+" Analytics",labels,mid,finals,midFinalAvgs); 
 }
+
+// function calcTopPerformer(dataRes){
+// 	var title,labels=[],mid=[],finals=[],midFinalAvgs=[]; 
+// 	title = `Student Performer`;
+// 	for(let avg of dataRes.avg_grade_timeline_analytics){
+// 		labels.push(`${avg.year_level} Year - ${avg.semester} Semester`);
+// 		midFinalAvgs.push((avg.mid_avg+avg.final_avg)/2); 
+// 		mid.push(avg.mid_avg);
+// 		finals.push(avg.final_avg); 
+// 	} 
+// 	generateTopPerformerBreakDownChart(makeid(),title+" Analytics",labels,mid,finals,midFinalAvgs); 
+// }
 
 function generateTopPerformerBreakDownChart(ctxID,title,labels,mid,finals,midFinalAvgs){ 
 	if(labels.length==0){return;}
